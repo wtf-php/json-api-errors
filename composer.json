@@ -1,0 +1,49 @@
+{
+  "name": "wtfphp/json-api-errors",
+  "description": "json-api-error middleware package",
+  "authors": [
+    {
+      "name": "Johannes Pichler",
+      "email": "admin@fetzi.dev",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Daniela Huber",
+      "email": "huber.daniela@live.at",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Cathrin Auer",
+      "email": "cathrin.auer@gmx.at",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Daniel Wittberger",
+      "email": "daniel@wittberger.net",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "php": "^7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0"
+  },
+  "scripts": {
+
+  },
+  "autoload": {
+    "psr-4": {
+      "WtfPhp\\JsonApiErrors": "src"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "process-timeout": 0
+  },
+  "autoload-dev": {
+    "psr-4": {
+
+    }
+  }
+}

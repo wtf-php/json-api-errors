@@ -1,0 +1,5 @@
+/coverage/
+/vendor/
+/tmp/
+/.idea
+composer.lock
