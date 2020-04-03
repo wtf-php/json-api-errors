@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "status": "422",
+      "code": "123",
+      "title": "A custom json:api error occured",
+      "detail": "Details about the error",
+      "source": {
+        "pointer": "/data/attributes/first-name"
+      },
+      "meta": {
+        "foo": "bar"
+      }
+    }
+  ]
+}
