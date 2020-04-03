@@ -29,21 +29,21 @@
   "require-dev": {
     "phpunit/phpunit": "^9.0"
   },
-  "scripts": {
-
-  },
   "autoload": {
     "psr-4": {
-      "WtfPhp\\JsonApiErrors": "src"
+      "WtfPhp\\JsonApiErrors\\": "src"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+        "WtfPhp\\JsonApiErrors\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "php vendor/bin/phpunit"
   },
   "config": {
     "sort-packages": true,
     "process-timeout": 0
-  },
-  "autoload-dev": {
-    "psr-4": {
-
-    }
   }
 }
