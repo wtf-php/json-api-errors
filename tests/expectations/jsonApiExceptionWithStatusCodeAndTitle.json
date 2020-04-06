@@ -1,0 +1,9 @@
+{
+  "errors": [
+    {
+      "status": "422",
+      "code": "123",
+      "title": "A custom json:api error occurred"
+    }
+  ]
+}

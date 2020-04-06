@@ -1,0 +1,9 @@
+{
+  "errors": [
+    {
+      "status": "Some error occurred",
+      "code": "600",
+      "title": "An exception occurred"
+    }
+  ]
+}
