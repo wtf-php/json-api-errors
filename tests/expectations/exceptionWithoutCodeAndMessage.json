@@ -2,7 +2,7 @@
   "errors": [
     {
       "status": "500",
-      "title": "An exception occured"
+      "title": "An exception occurred"
     }
   ]
 }

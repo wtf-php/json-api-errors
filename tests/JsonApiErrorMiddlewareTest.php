@@ -29,7 +29,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShoudHandleAnExceptionWithoutErrorCodeAndMessage()
+    public function itShouldHandleAnExceptionWithoutErrorCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -41,7 +41,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals('An exception occured', $response->getReasonPhrase());
+        $this->assertEquals('An exception occurred', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/exceptionWithoutCodeAndMessage.json',
             $response->getBody()->getContents()
@@ -54,14 +54,14 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new Exception('Some error occured', 600);
+                throw new Exception('Some error occurred', 600);
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals('Some error occured', $response->getReasonPhrase());
+        $this->assertEquals('Some error occurred', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/exceptionWithInvalidCode.json',
             $response->getBody()->getContents()
@@ -102,7 +102,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('A custom json:api error occured', $response->getReasonPhrase());
+        $this->assertEquals('A custom json:api error occurred', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/jsonApiExceptionWithStatusAndTitle.json',
             $response->getBody()->getContents()
@@ -188,7 +188,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/sonApiExceptionWithStatusCodeTitleDetailSourceAndMeta.json',
+            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceAndMeta.json',
             $response->getBody()->getContents()
         );
     }
@@ -209,7 +209,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/sonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
+            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
             $response->getBody()->getContents()
         );
     }

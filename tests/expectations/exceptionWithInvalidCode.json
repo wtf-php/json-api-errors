@@ -1,9 +1,9 @@
 {
   "errors": [
     {
-      "status": "Some error occured",
+      "status": "Some error occurred",
       "code": "600",
-      "title": "An exception occured"
+      "title": "An exception occurred"
     }
   ]
 }

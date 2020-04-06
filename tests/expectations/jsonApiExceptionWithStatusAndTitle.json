@@ -2,7 +2,7 @@
   "errors": [
     {
       "status": "422",
-      "title": "A custom json:api error occured"
+      "title": "A custom json:api error occurred"
     }
   ]
 }
