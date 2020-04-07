@@ -1,0 +1,25 @@
+name: Lint and Test
+
+on:
+  push:
+    branches: [ master, features/*, bugfix/*, dev/* ]
+  pull_request:
+    branches: [ master, features/*, bugfix/*, dev/* ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install composer dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: Test with PHPUnit
+      run: composer test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install composer dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: Lint with PHPCS
+      run: composer lint
