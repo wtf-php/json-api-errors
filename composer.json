@@ -23,10 +23,16 @@
             "name": "Daniel Wittberger",
             "email": "daniel@wittberger.net",
             "role": "Maintainer"
+        },
+        {
+            "name": "Judith Jeszenkovits",
+            "email": "judith.jeszenkovits@gmail.com",
+            "role": "Maintainer"
         }
     ],
     "require": {
         "php": "^7.4",
+        "illuminate/support": "^7.5",
         "psr/http-factory": "^1.0",
         "psr/http-server-middleware": "^1.0"
     },
