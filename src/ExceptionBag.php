@@ -2,42 +2,58 @@
 
 namespace WtfPhp\JsonApiErrors;
 
-use Illuminate\Support\Collection;
 use Throwable;
+use Tightenco\Collect\Support\Collection;
 
+/**
+ * Class ExceptionBag
+ * @package WtfPhp\JsonApiErrors
+ */
 class ExceptionBag implements ExceptionBagInterface
 {
     protected Collection $bag;
 
+    /**
+     * ExceptionBag constructor.
+     */
     public function __construct()
     {
         $this->bag = new Collection();
     }
 
+    /** @inheritDoc */
     public function add(Throwable $throwable): void
     {
         $this->bag->add($throwable);
     }
 
-    public function addMultiple(Collection $throwables): void
+    /** @inheritDoc */
+    public function addMultiple(array $throwables): void
     {
+        $throwables = new Collection($throwables);
+
         $throwables->each(function ($throwable) {
-            $this->bag->add($throwable);
+            if($throwable instanceof Throwable) {
+                $this->bag->add($throwable);
+            }
         });
     }
 
-    public function getAll(): Collection
+    /** @inheritDoc */
+    public function getAll(): array
     {
-        return $this->bag;
+        return $this->bag->toArray();
     }
 
+    /** @inheritDoc */
     public function isEmpty(): bool
     {
         return $this->bag->isEmpty();
     }
 
+    /** @inheritDoc */
     public function clear(): void
     {
-        $this->bag = new Collection(); // TODO NEXT: WTF There's no clear method for Collections…
+        $this->bag = new Collection();
     }
 }
