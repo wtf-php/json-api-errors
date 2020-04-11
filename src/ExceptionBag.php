@@ -33,7 +33,7 @@ class ExceptionBag implements ExceptionBagInterface
         $throwables = new Collection($throwables);
 
         $throwables->each(function ($throwable) {
-            if($throwable instanceof Throwable) {
+            if ($throwable instanceof Throwable) {
                 $this->bag->add($throwable);
             }
         });

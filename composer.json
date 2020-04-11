@@ -53,7 +53,7 @@
     },
     "scripts": {
         "test": "php vendor/bin/phpunit",
-        "lint": "vendor/bin/phpcs --standard=PSR2 --colors -w  ./src"
+        "lint": "vendor/bin/phpcs --standard=PSR12 --colors -w  ./src"
     },
     "config": {
         "sort-packages": true,
