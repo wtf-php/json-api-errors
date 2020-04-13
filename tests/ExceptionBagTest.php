@@ -18,13 +18,12 @@ class ExceptionBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddOneThrowable()
+    public function itShouldAddOneException()
     {
         $this->assertTrue($this->bag->isEmpty());
 
         $exception = new Exception('Something went wrong.');
         $this->bag->add($exception);
-
         $this->assertIsArray($this->bag->getAll());
         $this->assertFalse($this->bag->isEmpty());
         $this->assertCount(1, $this->bag->getAll());
@@ -32,17 +31,15 @@ class ExceptionBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddMultipleThrowables()
+    public function itShouldAddMultipleExceptions()
     {
         $this->assertTrue($this->bag->isEmpty());
 
-        $this->bag->addMultiple($this->throwables());
-
+        $this->bag->addMultiple($this->getExceptions());
         $this->assertIsArray($this->bag->getAll());
         $this->assertFalse($this->bag->isEmpty());
         $this->assertCount(3, $this->bag->getAll());
-
-        foreach($this->bag->getAll() as $exception) {
+        foreach ($this->bag->getAll() as $exception) {
             $this->assertInstanceOf(Exception::class, $exception);
         }
     }
@@ -52,11 +49,9 @@ class ExceptionBagTest extends TestCase
     {
         $this->assertTrue($this->bag->isEmpty());
 
-        $this->bag->addMultiple($this->throwables());
+        $this->bag->addMultiple($this->getExceptions());
         $this->assertFalse($this->bag->isEmpty());
-
         $this->bag->clear();
-
         $this->assertTrue($this->bag->isEmpty());
     }
 
@@ -66,12 +61,9 @@ class ExceptionBagTest extends TestCase
         $this->assertTrue($this->bag->isEmpty());
 
         $this->bag->addMultiple($this->throwablesAndNonthrowables());
-
         $this->assertFalse($this->bag->isEmpty());
-
         $this->assertCount(2, $this->bag->getAll());
-
-        foreach($this->bag->getAll() as $exception) {
+        foreach ($this->bag->getAll() as $exception) {
             $this->assertInstanceOf(Exception::class, $exception);
         }
     }
@@ -79,21 +71,24 @@ class ExceptionBagTest extends TestCase
     /**
      * @return array|Exception[]
      */
-    private function throwables(): array
+    private function getExceptions(): array
     {
         return [
             new Exception('Something went wrong.'),
             new Exception('Something went wrong.'),
-            new Exception('Something went wrong.')
+            new Exception('Something went wrong.'),
         ];
     }
 
+    /**
+     * @return array
+     */
     private function throwablesAndNonthrowables(): array
     {
         return [
             new Exception('Something went wrong.'),
             new TestResponse(),
-            new Exception('Something went wrong.')
+            new Exception('Something went wrong.'),
         ];
     }
 }
