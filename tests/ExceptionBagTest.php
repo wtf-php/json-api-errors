@@ -98,7 +98,7 @@ class ExceptionBagTest extends TestCase
     }
 
     /**
-     * @return array|Exception[]
+     * @return Exception[]
      */
     private function getExceptions(): array
     {
@@ -110,6 +110,9 @@ class ExceptionBagTest extends TestCase
         ];
     }
 
+    /**
+     * @return Error[]
+     */
     private function getErrors(): array
     {
         return [
