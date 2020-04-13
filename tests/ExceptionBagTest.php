@@ -2,10 +2,11 @@
 
 namespace WtfPhp\JsonApiErrors\Tests;
 
+use Error;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 use WtfPhp\JsonApiErrors\ExceptionBag;
-use WtfPhp\JsonApiErrors\Tests\Fakes\TestError;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestResponse;
 
 class ExceptionBagTest extends TestCase
@@ -28,20 +29,20 @@ class ExceptionBagTest extends TestCase
         $this->assertIsArray($this->bag->getAll());
         $this->assertFalse($this->bag->isEmpty());
         $this->assertCount(1, $this->bag->getAll());
-        $this->assertInstanceOf(Exception::class, $this->bag->getAll()[0]);
+        $this->assertInstanceOf(Throwable::class, $this->bag->getAll()[0]);
     }
 
     /** @test */
-    public function itShouldAddOneCustomError()
+    public function itShouldAddOneError()
     {
         $this->assertTrue($this->bag->isEmpty());
 
-        $exception = new TestError();
-        $this->bag->add($exception);
+        $error = new Error();
+        $this->bag->add($error);
         $this->assertIsArray($this->bag->getAll());
         $this->assertFalse($this->bag->isEmpty());
         $this->assertCount(1, $this->bag->getAll());
-        $this->assertInstanceOf(TestError::class, $this->bag->getAll()[0]);
+        $this->assertInstanceOf(Throwable::class, $this->bag->getAll()[0]);
     }
 
     /** @test */
@@ -52,14 +53,14 @@ class ExceptionBagTest extends TestCase
         $this->bag->addMultiple($this->getExceptions());
         $this->assertIsArray($this->bag->getAll());
         $this->assertFalse($this->bag->isEmpty());
-        $this->assertCount(3, $this->bag->getAll());
+        $this->assertCount(4, $this->bag->getAll());
         foreach ($this->bag->getAll() as $exception) {
-            $this->assertInstanceOf(Exception::class, $exception);
+            $this->assertInstanceOf(Throwable::class, $exception);
         }
     }
 
     /** @test */
-    public function itShouldAddMultipleCustomErrors()
+    public function itShouldAddMultipleErrors()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -68,7 +69,7 @@ class ExceptionBagTest extends TestCase
         $this->assertFalse($this->bag->isEmpty());
         $this->assertCount(3, $this->bag->getAll());
         foreach ($this->bag->getAll() as $error) {
-            $this->assertInstanceOf(TestError::class, $error);
+            $this->assertInstanceOf(Throwable::class, $error);
         }
     }
 
@@ -88,11 +89,11 @@ class ExceptionBagTest extends TestCase
     {
         $this->assertTrue($this->bag->isEmpty());
 
-        $this->bag->addMultiple($this->throwablesAndNonthrowables());
+        $this->bag->addMultiple($this->getThrowablesAndNonthrowables());
         $this->assertFalse($this->bag->isEmpty());
-        $this->assertCount(2, $this->bag->getAll());
+        $this->assertCount(3, $this->bag->getAll());
         foreach ($this->bag->getAll() as $exception) {
-            $this->assertInstanceOf(Exception::class, $exception);
+            $this->assertInstanceOf(Throwable::class, $exception);
         }
     }
 
@@ -105,26 +106,28 @@ class ExceptionBagTest extends TestCase
             new Exception('Something went wrong.'),
             new Exception('Something went wrong.'),
             new Exception('Something went wrong.'),
+            new Error(),
         ];
     }
 
     private function getErrors(): array
     {
         return [
-            new TestError(),
-            new TestError(),
-            new TestError(),
+            new Error(),
+            new Error(),
+            new Error(),
         ];
     }
 
     /**
      * @return array
      */
-    private function throwablesAndNonthrowables(): array
+    private function getThrowablesAndNonthrowables(): array
     {
         return [
             new Exception('Something went wrong.'),
             new TestResponse(),
+            new Error(),
             new Exception('Something went wrong.'),
         ];
     }
