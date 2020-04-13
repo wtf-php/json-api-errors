@@ -5,6 +5,7 @@ namespace WtfPhp\JsonApiErrors\Tests;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use WtfPhp\JsonApiErrors\ExceptionBag;
+use WtfPhp\JsonApiErrors\Tests\Fakes\TestError;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestResponse;
 
 class ExceptionBagTest extends TestCase
@@ -31,6 +32,19 @@ class ExceptionBagTest extends TestCase
     }
 
     /** @test */
+    public function itShouldAddOneCustomError()
+    {
+        $this->assertTrue($this->bag->isEmpty());
+
+        $exception = new TestError();
+        $this->bag->add($exception);
+        $this->assertIsArray($this->bag->getAll());
+        $this->assertFalse($this->bag->isEmpty());
+        $this->assertCount(1, $this->bag->getAll());
+        $this->assertInstanceOf(TestError::class, $this->bag->getAll()[0]);
+    }
+
+    /** @test */
     public function itShouldAddMultipleExceptions()
     {
         $this->assertTrue($this->bag->isEmpty());
@@ -41,6 +55,20 @@ class ExceptionBagTest extends TestCase
         $this->assertCount(3, $this->bag->getAll());
         foreach ($this->bag->getAll() as $exception) {
             $this->assertInstanceOf(Exception::class, $exception);
+        }
+    }
+
+    /** @test */
+    public function itShouldAddMultipleCustomErrors()
+    {
+        $this->assertTrue($this->bag->isEmpty());
+
+        $this->bag->addMultiple($this->getErrors());
+        $this->assertIsArray($this->bag->getAll());
+        $this->assertFalse($this->bag->isEmpty());
+        $this->assertCount(3, $this->bag->getAll());
+        foreach ($this->bag->getAll() as $error) {
+            $this->assertInstanceOf(TestError::class, $error);
         }
     }
 
@@ -77,6 +105,15 @@ class ExceptionBagTest extends TestCase
             new Exception('Something went wrong.'),
             new Exception('Something went wrong.'),
             new Exception('Something went wrong.'),
+        ];
+    }
+
+    private function getErrors(): array
+    {
+        return [
+            new TestError(),
+            new TestError(),
+            new TestError(),
         ];
     }
 
