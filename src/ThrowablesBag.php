@@ -6,15 +6,15 @@ use Throwable;
 use Tightenco\Collect\Support\Collection;
 
 /**
- * Class ExceptionBag
+ * Class ThrowablesBag
  * @package WtfPhp\JsonApiErrors
  */
-class ExceptionBag implements ExceptionBagInterface
+class ThrowablesBag implements ThrowablesBagInterface
 {
     protected Collection $bag;
 
     /**
-     * ExceptionBag constructor.
+     * ThrowablesBag constructor.
      */
     public function __construct()
     {

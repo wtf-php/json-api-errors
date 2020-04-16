@@ -75,7 +75,7 @@ class TestRequest implements ServerRequestInterface
 
     public function getRequestTarget()
     {
-        return "";
+        return '';
     }
 
     public function withRequestTarget($requestTarget)
@@ -85,7 +85,7 @@ class TestRequest implements ServerRequestInterface
 
     public function getMethod()
     {
-        return "";
+        return '';
     }
 
     public function withMethod($method)
@@ -105,7 +105,7 @@ class TestRequest implements ServerRequestInterface
 
     public function getProtocolVersion()
     {
-        return "1.1";
+        return '1.1';
     }
 
     public function withProtocolVersion($version)
@@ -130,7 +130,7 @@ class TestRequest implements ServerRequestInterface
 
     public function getHeaderLine($name)
     {
-        return "";
+        return '';
     }
 
     public function withHeader($name, $value)
