@@ -5,10 +5,10 @@ namespace WtfPhp\JsonApiErrors;
 use Throwable;
 
 /**
- * Interface ExceptionBagInterface
+ * Interface ThrowablesBagInterface
  * @package WtfPhp\JsonApiErrors
  */
-interface ExceptionBagInterface
+interface ThrowablesBagInterface
 {
     /**
      * @param Throwable $throwable
