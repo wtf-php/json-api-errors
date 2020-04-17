@@ -1,13 +1,13 @@
 <?php
 
-namespace WtfPhp\JsonApiErrors\Factory;
+namespace WtfPhp\JsonApiErrors\Factories;
 
 use Throwable;
 use WtfPhp\JsonApiErrors\Models\JsonError;
 
 /**
  * Interface JsonErrorFactoryInterface
- * @package WtfPhp\JsonApiErrors\Factory
+ * @package WtfPhp\JsonApiErrors\Factories
  */
 interface JsonErrorFactoryInterface
 {
