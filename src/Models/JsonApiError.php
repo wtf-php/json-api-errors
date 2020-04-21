@@ -10,7 +10,7 @@ class JsonApiError
 {
     public string $id;
     public string $code;
-    public int $status;
+    public string $status;
     public string $title;
     public string $detail;
     public array $links;

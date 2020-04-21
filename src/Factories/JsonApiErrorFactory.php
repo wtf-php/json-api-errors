@@ -18,7 +18,7 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
     public static function createFromThrowable(Throwable $throwable): JsonApiError
     {
         $jsonError = new JsonApiError();
-        $jsonError->code = $throwable->getCode();
+        $jsonError->code = (string)$throwable->getCode();
         $jsonError->title = $throwable->getMessage();
         $jsonError->detail = $throwable->getTraceAsString();
 
