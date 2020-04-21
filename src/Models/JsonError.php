@@ -15,5 +15,5 @@ class JsonError
     public string $detail;
     public array $links;
     public array $source;
-    public $meta;
+    public array $meta;
 }

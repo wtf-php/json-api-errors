@@ -3,6 +3,7 @@
 namespace WtfPhp\JsonApiErrors\Factories;
 
 use Throwable;
+use WtfPhp\JsonApiErrors\Exceptions\JsonErrorException;
 use WtfPhp\JsonApiErrors\Models\JsonError;
 
 /**
@@ -14,17 +15,21 @@ class JsonErrorFactory implements JsonErrorFactoryInterface
     /**
      * @inheritDoc
      */
-    public static function createFromThrowable(Throwable $throwable, $status = 500): JsonError
+    public static function createFromThrowable(Throwable $throwable, int $status = 500): JsonError
     {
         $jsonError = new JsonError();
-        $jsonError->status = $status;
         $jsonError->code = $throwable->getCode();
         $jsonError->title = $throwable->getMessage();
         $jsonError->detail = $throwable->getTraceAsString();
         $jsonError->links = [
-            'file' => $throwable->getFile(),
-            'line' => $throwable->getLine()
+            'about' => sprintf('%s at lint %s', $throwable->getFile(), $throwable->getLine())
         ];
+
+        if ($throwable instanceof JsonErrorException) {
+            $jsonError->id = $throwable->getId() ?? '';
+            $jsonError->status = $throwable->getStatusCode() ?? $status;
+            $jsonError->meta = $throwable->getMeta() ?? [];
+        }
 
         return $jsonError;
     }
@@ -32,7 +37,7 @@ class JsonErrorFactory implements JsonErrorFactoryInterface
     /**
      * @inheritDoc
      */
-    public static function createFromThrowables(array $throwables, $status = 500): array
+    public static function createFromThrowables(array $throwables, int $status = 500): array
     {
         $jsonErrorObjects = [];
 
