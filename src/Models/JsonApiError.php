@@ -3,10 +3,10 @@
 namespace WtfPhp\JsonApiErrors\Models;
 
 /**
- * Class JsonError
+ * Class JsonApiError
  * @package WtfPhp\JsonApiErrors\Models
  */
-class JsonError
+class JsonApiError
 {
     public string $id;
     public string $code;

@@ -3,23 +3,23 @@
 namespace WtfPhp\JsonApiErrors\Factories;
 
 use Throwable;
-use WtfPhp\JsonApiErrors\Models\JsonError;
+use WtfPhp\JsonApiErrors\Models\JsonApiError;
 
 /**
- * Interface JsonErrorFactoryInterface
+ * Interface JsonApiErrorFactoryInterface
  * @package WtfPhp\JsonApiErrors\Factories
  */
-interface JsonErrorFactoryInterface
+interface JsonApiErrorFactoryInterface
 {
     /**
      * @param Throwable $throwable
-     * @return JsonError
+     * @return JsonApiError
      */
-    public static function createFromThrowable(Throwable $throwable): JsonError;
+    public static function createFromThrowable(Throwable $throwable): JsonApiError;
 
     /**
      * @param Throwable[] $throwables
-     * @return JsonError[]
+     * @return JsonApiError[]
      */
     public static function createFromThrowables(array $throwables): array;
 }
