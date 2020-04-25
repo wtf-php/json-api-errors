@@ -1,8 +1,1 @@
-{
-  "errors": [
-    {
-      "status": "500",
-      "title": "An exception occurred"
-    }
-  ]
-}
+{"errors":[{"status":"500","title":"Internal Server Error"}]}

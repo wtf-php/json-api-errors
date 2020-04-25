@@ -18,8 +18,9 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
     public static function createFromThrowable(Throwable $throwable): JsonApiError
     {
         $jsonError = new JsonApiError();
-        $jsonError->code = (string)$throwable->getCode();
+        $jsonError->code = (string) $throwable->getCode();
         $jsonError->title = $throwable->getMessage();
+        // TODO NEXT: Make it configurable if trace should be set or not
         $jsonError->detail = $throwable->getTraceAsString();
 
         if ($throwable instanceof JsonApiErrorException) {
@@ -27,7 +28,7 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
             $jsonError->status = $throwable->getStatusCode();
             $jsonError->meta = $throwable->getMeta();
             $jsonError->links = [
-                'about' => $throwable->getAboutLink()
+                'about' => $throwable->getAboutLink(),
             ];
         }
 

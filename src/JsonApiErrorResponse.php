@@ -1,25 +1,25 @@
 <?php
 
-namespace WtfPhp\JsonApiErrors\Tests\Fakes;
+namespace WtfPhp\JsonApiErrors;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class TestResponse implements ResponseInterface
+/**
+ * Class JsonApiErrorResponse
+ * @package WtfPhp\JsonApiErrors
+ */
+class JsonApiErrorResponse implements ResponseInterface
 {
-    private int $statusCode;
-
-    private string $reasonPhrase;
-
-    private string $protocolVersion;
-
-    private array $headers;
-
-    private StreamInterface $body;
+    private int $statusCode = 0;
+    private string $reasonPhrase = '';
+    private string $protocolVersion = '';
+    private array $headers = [];
+    private ?StreamInterface $body = null;
 
     public function __construct()
     {
-        $this->body = new TestBody();
+        $this->body = new JsonApiBody();
     }
 
     public function getStatusCode()

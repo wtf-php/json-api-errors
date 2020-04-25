@@ -8,24 +8,35 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
+use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
+use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
 use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
-use WtfPhp\JsonApiErrors\JsonApiException;
+use WtfPhp\JsonApiErrors\JsonApiErrorResponseSchema;
+use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
-use WtfPhp\JsonApiErrors\Tests\Fakes\TestResponseFactory;
 
 class JsonApiErrorMiddlewareTest extends TestCase
 {
     protected ServerRequestInterface $request;
-
     protected ResponseFactoryInterface $responseFactory;
-
     protected JsonApiErrorMiddleware $middleware;
+    protected JsonApiErrorFactory $jsonApiErrorFactory;
+    protected JsonApiErrorResponseSchema $jsonApiErrorResponseSchema;
+    protected JsonApiErrorService $jsonApiErrorService;
 
     protected function setUp(): void
     {
         $this->request = new TestRequest();
-        $this->responseFactory = new TestResponseFactory();
-        $this->middleware = new JsonApiErrorMiddleware($this->responseFactory);
+        $this->responseFactory = new JsonApiErrorResponseFactory();
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory();
+        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
+        $this->jsonApiErrorService = new JsonApiErrorService(
+            $this->jsonApiErrorFactory,
+            $this->responseFactory,
+            $this->jsonApiErrorResponseSchema
+        );
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
     }
 
     /** @test */
@@ -34,6 +45,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertTrue(true);
     }
 
+    /** @test */
     public function itShouldHandleAnExceptionWithoutErrorCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
@@ -46,13 +58,18 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals('An exception occurred', $response->getReasonPhrase());
+        // TODO NOW: Use default error message and default http status code
+        $this->assertEquals('Internal Server Error', $response->getReasonPhrase());
+
+        // TODO NOW: Change this: Don't do string comparison!
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/exceptionWithoutCodeAndMessage.json',
             $response->getBody()->getContents()
         );
     }
 
+    // TODO NOW Fetzi: Is the expected json-file really correct? Do we really want to have a text in the status - how do we handle this?
+    /** @test */
     public function itShouldHandleAnExceptionWithAnInvalidStatusCode()
     {
         $nextHandler = new class implements RequestHandlerInterface {
@@ -61,6 +78,9 @@ class JsonApiErrorMiddlewareTest extends TestCase
                 throw new Exception('Some error occurred', 600);
             }
         };
+
+        // We set default to 500 if there is no status!
+        // If code == http status code then set the code also as status for default exceptions / errors (not for the JsonApiErrorException).
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
@@ -72,6 +92,8 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
+    // INFO: Test would work if there wouldn't be the `detail`...string comparison...puke...
+    /** @test */
     public function itShouldHandleAnExceptionWithValidStatusCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
@@ -91,13 +113,13 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
+    /** @test */
     public function itShouldHandleAJsonApiExceptionWithStatusAndTitle()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiException();
+                throw new JsonApiErrorException('A custom json:api error occurred', 0, null, '', 422);
             }
         };
 
@@ -111,13 +133,14 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
-    public function itShouldHandleAJsonApiExceptionWithStatusCodeAndTitle()
+    /** @test */
+    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitle()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiException();
+                // TODO NOW: Think about order of params!
+                throw new JsonApiErrorException('The entity was not processable', '123', null, '', '422');
             }
         };
 
@@ -131,13 +154,13 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
-    public function itShouldHandleAJsonApiExceptionWithStatusCodeTitleAndDetail()
+    // TODO NOW: What should be mapped as detail trace as string?
+    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetail()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiException();
+                throw new JsonApiErrorException('The entity was not processable', '123', null, '', '422');
             }
         };
 
@@ -151,13 +174,14 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
-    public function itShouldHandleAJsonApiExceptionWithStatusCodeTitleDetailAndSource()
+    // TODO NOW: Do we event want to implement the whole source->pointer thing?
+    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSource()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 // TODO: add correct instantiation
-                throw new JsonApiException();
+                throw new JsonApiErrorException();
             }
         };
 
@@ -171,13 +195,13 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
-    public function itShouldHandleAJsonApiExceptionWithStatusCodeTitleDetailSourceAndMeta()
+    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMeta()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 // TODO: add correct instantiation
-                throw new JsonApiException();
+                throw new JsonApiErrorException();
             }
         };
 
@@ -191,13 +215,13 @@ class JsonApiErrorMiddlewareTest extends TestCase
         );
     }
 
-    public function itShouldHandleAJsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId()
+    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMetaAndId()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 // TODO: add correct instantiation
-                throw new JsonApiException();
+                throw new JsonApiErrorException();
             }
         };
 

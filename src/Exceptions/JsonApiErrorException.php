@@ -11,6 +11,7 @@ use Throwable;
  */
 class JsonApiErrorException extends Exception
 {
+    // TODO NOW: What about detail?
     protected string $id = '';
     protected string $statusCode = '500';
     protected array $meta = [];

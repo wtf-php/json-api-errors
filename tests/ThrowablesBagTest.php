@@ -6,8 +6,8 @@ use Error;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Throwable;
+use WtfPhp\JsonApiErrors\JsonApiErrorResponse;
 use WtfPhp\JsonApiErrors\ThrowablesBag;
-use WtfPhp\JsonApiErrors\Tests\Fakes\TestResponse;
 
 class ThrowablesBagTest extends TestCase
 {
@@ -150,7 +150,7 @@ class ThrowablesBagTest extends TestCase
     {
         return [
             new Exception('Something went wrong.'),
-            new TestResponse(),
+            new JsonApiErrorResponse(),
             new Error(),
             new Exception('Something went wrong.'),
         ];
