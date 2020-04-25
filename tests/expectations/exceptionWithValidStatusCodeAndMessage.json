@@ -1,7 +1,7 @@
 {
   "errors": [
     {
-      "status": "422",
+      "code": "422",
       "title": "The entity was not processable"
     }
   ]
