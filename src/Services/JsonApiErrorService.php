@@ -46,7 +46,7 @@ class JsonApiErrorService
         $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiError($jsonApiError);
 
         if ($t instanceof JsonApiErrorException) {
-            $status = $t->getStatusCode();
+            $status = $t->getCode();
         } else {
             if (empty($t->getCode()) || (!empty($t->getCode()) && !$this->isValidHttpStatus($t->getCode()))) {
                 $status = 500;
