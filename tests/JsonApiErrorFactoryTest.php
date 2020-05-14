@@ -8,6 +8,7 @@ use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Models\JsonApiError;
 
+// TODO NEXT: Rework after adding source and detail!
 class JsonApiErrorFactoryTest extends TestCase
 {
     /** @test */
@@ -20,7 +21,15 @@ class JsonApiErrorFactoryTest extends TestCase
     /** @test */
     public function itShouldReturnAJsonApiErrorObjectFromJsonErrorException()
     {
-        $jsonException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+        $jsonException = new JsonApiErrorException(
+            'a custom message',
+            0,
+            null,
+            'foo',
+            '504',
+            ['bar' => 'baz'],
+            'testlink'
+        );
         $this->assertInstanceOf(JsonApiError::class, JsonApiErrorFactory::createFromThrowable($jsonException));
     }
 
@@ -43,18 +52,17 @@ class JsonApiErrorFactoryTest extends TestCase
     }
 
     /** @test */
-    public function itShouldContainTheErrorMessage()
-    {
-        $e = new Exception('bar', 2020);
-        $jsonApiErrorObject = JsonApiErrorFactory::createFromThrowable($e);
-        $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
-        $this->assertStringContainsString('{main}', $jsonApiErrorObject->detail);
-    }
-
-    /** @test */
     public function itShouldContainTheErrorLinks()
     {
-        $jsonException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+        $jsonException = new JsonApiErrorException(
+            'a custom message',
+            0,
+            null,
+            'foo',
+            '504',
+            ['bar' => 'baz'],
+            'testlink'
+        );
         $jsonApiErrorObject = JsonApiErrorFactory::createFromThrowable($jsonException);
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertIsArray($jsonApiErrorObject->links);
@@ -65,7 +73,15 @@ class JsonApiErrorFactoryTest extends TestCase
     /** @test */
     public function itShouldContainTheHttpStatusCode()
     {
-        $jsonException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+        $jsonException = new JsonApiErrorException(
+            'a custom message',
+            0,
+            null,
+            '504',
+            'foo',
+            ['bar' => 'baz'],
+            'testlink'
+        );
         $jsonApiErrorObject = JsonApiErrorFactory::createFromThrowable($jsonException);
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertEquals('504', $jsonApiErrorObject->status);
@@ -74,7 +90,15 @@ class JsonApiErrorFactoryTest extends TestCase
     /** @test */
     public function itShouldContainTheId()
     {
-        $jsonException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+        $jsonException = new JsonApiErrorException(
+            'a custom message',
+            0,
+            null,
+            '504',
+            'foo',
+            ['bar' => 'baz'],
+            'testlink'
+        );
         $jsonApiErrorObject = JsonApiErrorFactory::createFromThrowable($jsonException);
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertEquals('foo', $jsonApiErrorObject->id);
@@ -83,7 +107,15 @@ class JsonApiErrorFactoryTest extends TestCase
     /** @test */
     public function itShouldContainTheMetaInfo()
     {
-        $jsonException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+        $jsonException = new JsonApiErrorException(
+            'a custom message',
+            0,
+            null,
+            'foo',
+            '504',
+            ['bar' => 'baz'],
+            'testlink'
+        );
         $jsonApiErrorObject = JsonApiErrorFactory::createFromThrowable($jsonException);
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertEquals(['bar' => 'baz'], $jsonApiErrorObject->meta);

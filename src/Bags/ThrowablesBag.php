@@ -1,6 +1,6 @@
 <?php
 
-namespace WtfPhp\JsonApiErrors;
+namespace WtfPhp\JsonApiErrors\Bags;
 
 use Throwable;
 use Tightenco\Collect\Support\Collection;

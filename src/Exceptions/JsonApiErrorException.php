@@ -11,8 +11,10 @@ use Throwable;
  */
 class JsonApiErrorException extends Exception
 {
+    // TODO NEXT: Add source and detail!
+
     protected string $id = '';
-    protected string $statusCode = '500';
+    protected string $status = '500';
     protected array $meta = [];
     protected string $aboutLink = '';
 
@@ -21,8 +23,8 @@ class JsonApiErrorException extends Exception
      * @param string $message
      * @param int $code
      * @param Throwable|null $previous
+     * @param string $status
      * @param string $id
-     * @param string $statusCode
      * @param array $meta
      * @param string $aboutLink
      */
@@ -30,16 +32,15 @@ class JsonApiErrorException extends Exception
         string $message = '',
         int $code = 0,
         Throwable $previous = null,
+        string $status = '500',
         string $id = '',
-        string $statusCode = '500',
         array $meta = [],
         string $aboutLink = ''
     ) {
         parent::__construct($message, $code, $previous);
+        $this->status = $status;
         $this->id = $id;
-        $this->code = $code;
         $this->meta = $meta;
-        $this->statusCode = $statusCode;
         $this->aboutLink = $aboutLink;
     }
 
@@ -54,9 +55,9 @@ class JsonApiErrorException extends Exception
     /**
      * @return string
      */
-    public function getStatusCode(): string
+    public function getStatus(): string
     {
-        return $this->statusCode;
+        return $this->status;
     }
 
     /**

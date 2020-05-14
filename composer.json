@@ -32,6 +32,7 @@
     ],
     "require": {
         "php": "^7.4",
+        "lukasoppermann/http-status": "^2.0",
         "psr/http-factory": "^1.0",
         "psr/http-server-middleware": "^1.0",
         "tightenco/collect": "^7.5"

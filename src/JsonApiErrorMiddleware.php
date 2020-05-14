@@ -2,23 +2,39 @@
 
 namespace WtfPhp\JsonApiErrors;
 
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
+use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
+/**
+ * Class JsonApiErrorMiddleware
+ * @package WtfPhp\JsonApiErrors
+ */
 class JsonApiErrorMiddleware implements MiddlewareInterface
 {
-    private ResponseFactoryInterface $responseFactory;
+    private JsonApiErrorService $jsonApiErrorService;
 
-    public function __construct(ResponseFactoryInterface $responseFactory)
+    public function __construct(JsonApiErrorService $jsonApiErrorService)
     {
-        $this->responseFactory = $responseFactory;
+        $this->jsonApiErrorService = $jsonApiErrorService;
     }
 
+    /**
+     * Currently handles only a single Throwable.
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $handler->handle($request);
+        try {
+            return $handler->handle($request);
+        } catch (Throwable $t) {
+            return $this->jsonApiErrorService->buildResponse($t);
+        }
     }
 }
