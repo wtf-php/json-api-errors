@@ -74,7 +74,7 @@ class JsonApiBody implements StreamInterface
     public function write($string)
     {
         $this->content .= $string;
-        return strlen($string);
+        return strlen($this->content);
     }
 
     /** @inheritDoc */
@@ -86,6 +86,7 @@ class JsonApiBody implements StreamInterface
     /** @inheritDoc */
     public function read($length)
     {
+        return $this->content;
     }
 
     /** @inheritDoc */

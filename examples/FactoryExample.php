@@ -2,14 +2,22 @@
 
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
-use WtfPhp\JsonApiErrors\ThrowablesBag;
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 
 require '../vendor/autoload.php';
 
 $bag = new ThrowablesBag();
 $exception = new Exception('foobar', 123);
 $anotherException = new Exception('baz', 400);
-$jsonErrorException = new JsonApiErrorException('a custom message', 0, null, 'foo', '504', ['bar' => 'baz'], 'testlink');
+$jsonErrorException = new JsonApiErrorException(
+    'a custom message',
+    303,
+    null,
+    500,
+    '504',
+    ['bar' => 'baz'],
+    'testlink'
+);
 
 $bag->add($exception);
 $bag->add($anotherException);
