@@ -4,7 +4,7 @@ namespace WtfPhp\JsonApiErrors\Factories;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
-use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponse;
+use Slim\Psr7\Response;
 
 /**
  * Class JsonApiErrorResponseFactory
@@ -19,8 +19,8 @@ class JsonApiErrorResponseFactory implements ResponseFactoryInterface
      */
     public function createResponse(int $status = 200, string $reasonPhrase = ''): ResponseInterface
     {
-        $response = new JsonApiErrorResponse();
-        $response->withStatus($status, $reasonPhrase);
+        $response = new Response();
+        $response = $response->withStatus($status, $reasonPhrase);
         return $response;
     }
 }

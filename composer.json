@@ -30,6 +30,8 @@
         "lukasoppermann/http-status": "^2.0",
         "psr/http-factory": "^1.0",
         "psr/http-server-middleware": "^1.0",
+        "slim/psr7": "^1.1",
+        "slim/slim": "4.*",
         "tightenco/collect": "^7.5"
     },
     "require-dev": {
