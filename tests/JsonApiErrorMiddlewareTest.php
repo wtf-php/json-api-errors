@@ -231,7 +231,11 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertCount(count($expected['errors'][0]), $actual['errors'][0]);
 
         foreach ($expected['errors'][0] as $key => $value) {
-            $this->assertEquals($expected['errors'][0][$key], $actual['errors'][0][$key]);
+            if ($key === 'detail') {
+                $this->assertGreaterThanOrEqual(strlen($expected['errors'][0][$key]), strlen($actual['errors'][0][$key]));
+            } else {
+                $this->assertEquals($expected['errors'][0][$key], $actual['errors'][0][$key]);
+            }
         }
     }
 

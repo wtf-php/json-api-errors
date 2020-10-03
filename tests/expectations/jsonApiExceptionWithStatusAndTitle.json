@@ -2,7 +2,8 @@
   "errors": [
     {
       "status": "422",
-      "title": "A custom json:api error occurred"
+      "title": "A custom json:api error occurred",
+      "detail": "foobar"
     }
   ]
 }
