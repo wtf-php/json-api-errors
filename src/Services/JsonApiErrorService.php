@@ -41,7 +41,7 @@ class JsonApiErrorService
      */
     public function buildResponse(Throwable $t): ResponseInterface
     {
-        $jsonApiError = $this->jsonApiErrorFactory::createFromThrowable($t);
+        $jsonApiError = $this->jsonApiErrorFactory->createFromThrowable($t);
         $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiError($jsonApiError);
 
         if ($t instanceof JsonApiErrorException) {

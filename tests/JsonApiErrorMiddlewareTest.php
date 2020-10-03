@@ -31,7 +31,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
     {
         $this->request = new TestRequest();
         $this->responseFactory = new JsonApiErrorResponseFactory();
-        $this->jsonApiErrorFactory = new JsonApiErrorFactory();
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory(true);
         $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
         $this->httpStatusHelper = new Httpstatus();
         $this->jsonApiErrorService = new JsonApiErrorService(
