@@ -29,18 +29,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = new TestRequest();
-        $this->responseFactory = new JsonApiErrorResponseFactory();
-        $this->jsonApiErrorFactory = new JsonApiErrorFactory();
-        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
-        $this->httpStatusHelper = new Httpstatus();
-        $this->jsonApiErrorService = new JsonApiErrorService(
-            $this->jsonApiErrorFactory,
-            $this->responseFactory,
-            $this->jsonApiErrorResponseSchema,
-            $this->httpStatusHelper
-        );
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
+        $this->setUpWithMode();
     }
 
     /** @test */
@@ -95,6 +84,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
         $this->assertExpectedWithResponse('exceptionWithValidStatusCodeAndMessage.json', $response);
+    }
+
+    /** @test */
+    public function itShouldHandleAnExceptionWithValidStatusCodeMessageAndStacktrace()
+    {
+        $this->setUpWithMode(true);
+
+        $nextHandler = new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                throw new Exception('The entity was not processable', 422);
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('exceptionWithValidStatusCodeMessageAndStacktrace.json', $response);
     }
 
     /** @test */
@@ -231,7 +240,11 @@ class JsonApiErrorMiddlewareTest extends TestCase
         $this->assertCount(count($expected['errors'][0]), $actual['errors'][0]);
 
         foreach ($expected['errors'][0] as $key => $value) {
-            $this->assertEquals($expected['errors'][0][$key], $actual['errors'][0][$key]);
+            if ($key === 'detail') {
+                $this->assertGreaterThanOrEqual(strlen($expected['errors'][0][$key]), strlen($actual['errors'][0][$key]));
+            } else {
+                $this->assertEquals($expected['errors'][0][$key], $actual['errors'][0][$key]);
+            }
         }
     }
 
@@ -243,5 +256,25 @@ class JsonApiErrorMiddlewareTest extends TestCase
     {
         $content = file_get_contents($path);
         return json_decode($content, true);
+    }
+
+    /**
+     * @param bool $debugMode 
+     * @return void 
+     */
+    private function setUpWithMode(bool $debugMode = false): void 
+    {
+        $this->request = new TestRequest();
+        $this->responseFactory = new JsonApiErrorResponseFactory();
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory($debugMode);
+        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
+        $this->httpStatusHelper = new Httpstatus();
+        $this->jsonApiErrorService = new JsonApiErrorService(
+            $this->jsonApiErrorFactory,
+            $this->responseFactory,
+            $this->jsonApiErrorResponseSchema,
+            $this->httpStatusHelper
+        );
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
     }
 }

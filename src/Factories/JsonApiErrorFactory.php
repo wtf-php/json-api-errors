@@ -12,27 +12,38 @@ use WtfPhp\JsonApiErrors\Models\JsonApiError;
  */
 class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
 {
+    private bool $debug;
+
+    public function __construct(bool $debug)
+    {
+        $this->debug = $debug;
+    }
+
     /**
      * @inheritDoc
      */
-    public static function createFromThrowable(Throwable $throwable): JsonApiError
+    public function createFromThrowable(Throwable $throwable): JsonApiError
     {
         $jsonError = new JsonApiError();
         $jsonError->title = !empty($throwable->getMessage()) ? $throwable->getMessage() : 'Internal Server Error';
-        // TODO NEXT: Make it configurable if trace should be set or not
-        // => Put stack trace in `meta` as array.
-        $jsonError->detail = ''; // $throwable->getTraceAsString();
+
+        if ($this->debug) {
+            $jsonError->detail = $throwable->getTraceAsString();
+        }
 
         if ($throwable instanceof JsonApiErrorException) {
             $jsonError->code = $throwable->getCode();
             $jsonError->id = $throwable->getId();
             $jsonError->status = $throwable->getStatus();
-            $jsonError->meta = $throwable->getMeta();
 
-            if (!empty($throwable->getAboutLink())) {
-                $jsonError->links = [
-                    'about' => $throwable->getAboutLink(),
-                ];
+            if ($this->debug) {
+                $jsonError->meta = $throwable->getMeta();
+
+                if (!empty($throwable->getAboutLink())) {
+                    $jsonError->links = [
+                        'about' => $throwable->getAboutLink(),
+                    ];
+                }
             }
         } else {
             $jsonError->code = ($throwable->getCode() > 0) ? (string) $throwable->getCode() : '500';
@@ -44,12 +55,12 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
     /**
      * @inheritDoc
      */
-    public static function createFromThrowables(array $throwables): array
+    public function createFromThrowables(array $throwables): array
     {
         $jsonErrorObjects = [];
 
         foreach ($throwables as $item) {
-            $jsonErrorObjects[] = self::createFromThrowable($item);
+            $jsonErrorObjects[] = $this->createFromThrowable($item);
         }
 
         return $jsonErrorObjects;

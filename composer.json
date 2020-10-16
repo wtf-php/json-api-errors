@@ -23,11 +23,6 @@
             "name": "Daniel Wittberger",
             "email": "daniel@wittberger.net",
             "role": "Maintainer"
-        },
-        {
-            "name": "Judith Jeszenkovits",
-            "email": "judith.jeszenkovits@gmail.com",
-            "role": "Maintainer"
         }
     ],
     "require": {
