@@ -3,8 +3,7 @@
     {
       "status": "422",
       "code": "123",
-      "title": "The entity was not processable",
-      "detail": "foobar"
+      "title": "The entity was not processable"
     }
   ]
 }

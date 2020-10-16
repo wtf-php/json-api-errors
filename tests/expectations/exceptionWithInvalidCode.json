@@ -2,8 +2,7 @@
   "errors": [
     {
       "code": "600",
-      "title": "Some error occurred",
-      "detail": "foobar"
+      "title": "Some error occurred"
     }
   ]
 }

@@ -26,7 +26,6 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
     {
         $jsonError = new JsonApiError();
         $jsonError->title = !empty($throwable->getMessage()) ? $throwable->getMessage() : 'Internal Server Error';
-        $jsonError->detail = '';
 
         if ($this->debug) {
             $jsonError->detail = $throwable->getTraceAsString();
