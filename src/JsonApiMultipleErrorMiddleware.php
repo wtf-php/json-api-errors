@@ -7,19 +7,22 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
 /**
  * Class JsonApiErrorMiddleware
  * @package WtfPhp\JsonApiErrors
  */
-class JsonApiErrorMiddleware implements MiddlewareInterface
+class JsonApiMultipleErrorMiddleware implements MiddlewareInterface
 {
     private JsonApiErrorService $jsonApiErrorService;
+    private ThrowablesBag $bag;
 
-    public function __construct(JsonApiErrorService $jsonApiErrorService)
+    public function __construct(JsonApiErrorService $jsonApiErrorService, ThrowablesBag $bag)
     {
         $this->jsonApiErrorService = $jsonApiErrorService;
+        $this->bag = $bag;
     }
 
     /**
@@ -32,9 +35,16 @@ class JsonApiErrorMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            return $handler->handle($request);
+            $response = $handler->handle($request);
         } catch (Throwable $t) {
+            dd($t);
             return $this->jsonApiErrorService->buildResponse($t);
         }
+
+        if ($this->bag->isEmpty()) {
+            return $response;
+        }
+
+        return $this->jsonApiErrorService->buildResponseForMultiple($this->bag->getAll());
     }
 }

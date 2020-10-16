@@ -63,6 +63,48 @@ class JsonApiErrorService
     }
 
     /**
+     * @param array $throwables
+     * @return ResponseInterface
+     */
+    public function buildResponseForMultiple(array $throwables): ResponseInterface
+    {
+        $jsonErrorObjects = $this->jsonApiErrorFactory::createFromThrowables($throwables);
+        $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiErrorList($jsonErrorObjects);
+        $generalCode = Status::HTTP_INTERNAL_SERVER_ERROR;
+        $stati = [];
+
+        foreach ($throwables as $t) {
+            if ($t instanceof JsonApiErrorException) {
+                $status = $t->getStatus();
+            } else {
+                if (empty($t->getCode()) || (!empty($t->getCode()) && !$this->isValidHttpStatusCode($t->getCode()))) {
+                    $status = Status::HTTP_INTERNAL_SERVER_ERROR;
+                } else {
+                    $status = $t->getCode();
+                }
+            }
+
+            $stati[] = $status;
+        }
+
+        foreach ($stati as $status) {
+            if ($status >= Status::HTTP_INTERNAL_SERVER_ERROR) {
+                break;
+            }
+
+            $generalCode = Status::HTTP_BAD_REQUEST;
+            break;
+        }
+
+        $reasonPhrase = $this->getReasonPhraseForStatusCode($generalCode);
+
+        /** @var JsonApiErrorResponse $response */
+        $response = $this->jsonApiErrorResponseFactory->createResponse($generalCode, $reasonPhrase);
+        $response->getBody()->write($jsonApiErrors);
+        return $response;
+    }
+
+    /**
      * @param int $statusCode
      * @return bool
      */

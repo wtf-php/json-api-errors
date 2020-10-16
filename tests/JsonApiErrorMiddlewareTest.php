@@ -12,7 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiSingleErrorMiddleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
@@ -21,7 +21,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
 {
     protected ServerRequestInterface $request;
     protected ResponseFactoryInterface $responseFactory;
-    protected JsonApiErrorMiddleware $middleware;
+    protected JsonApiSingleErrorMiddleware $middleware;
     protected JsonApiErrorFactory $jsonApiErrorFactory;
     protected JsonApiErrorResponseSchema $jsonApiErrorResponseSchema;
     protected JsonApiErrorService $jsonApiErrorService;
@@ -40,7 +40,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
             $this->jsonApiErrorResponseSchema,
             $this->httpStatusHelper
         );
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
+        $this->middleware = new JsonApiSingleErrorMiddleware($this->jsonApiErrorService);
     }
 
     /** @test */
