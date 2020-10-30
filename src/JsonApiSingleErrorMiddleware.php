@@ -11,6 +11,7 @@ use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
 /**
  * Class JsonApiErrorMiddleware
+ *
  * @package WtfPhp\JsonApiErrors
  */
 class JsonApiSingleErrorMiddleware implements MiddlewareInterface

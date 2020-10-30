@@ -17,23 +17,28 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = AppFactory::create();
 $bag = new ThrowablesBag();
 
-$app->add(new JsonApiMultipleErrorMiddleware(
-    new JsonApiErrorService(
-        new JsonApiErrorFactory(),
-        new JsonApiErrorResponseFactory(),
-        new JsonApiErrorResponseSchema(),
-        new Httpstatus()
-    ),
-    $bag
-));
+$app->add(
+    new JsonApiMultipleErrorMiddleware(
+        new JsonApiErrorService(
+            new JsonApiErrorFactory(false),
+            new JsonApiErrorResponseFactory(),
+            new JsonApiErrorResponseSchema(),
+            new Httpstatus()
+        ),
+        $bag
+    )
+);
 
-$app->get('/index', function (ServerRequestInterface $request): ResponseInterface {
-    /*
-     $bag->add(new Exception('Testing middleware for multiple exceptions', 500));
-     $bag->add(new Exception('Testing middleware for multiple exception 2'));
-    */
-     $response = new Response();
-     return $response->withStatus(200);
-});
+$app->get(
+    '/index',
+    function (ServerRequestInterface $request): ResponseInterface {
+        /*
+        $bag->add(new Exception('Testing middleware for multiple exceptions', 500));
+        $bag->add(new Exception('Testing middleware for multiple exception 2'));
+        */
+        $response = new Response();
+        return $response->withStatus(200);
+    }
+);
 
 $app->run();

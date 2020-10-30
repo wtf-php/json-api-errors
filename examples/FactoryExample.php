@@ -3,7 +3,6 @@
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
-use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 
 require '../vendor/autoload.php';
 
