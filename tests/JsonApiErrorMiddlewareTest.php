@@ -31,7 +31,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
     {
         $this->request = new TestRequest();
         $this->responseFactory = new JsonApiErrorResponseFactory();
-        $this->jsonApiErrorFactory = new JsonApiErrorFactory();
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory(false);
         $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
         $this->httpStatusHelper = new Httpstatus();
         $this->jsonApiErrorService = new JsonApiErrorService(
@@ -270,10 +270,10 @@ class JsonApiErrorMiddlewareTest extends TestCase
     }
 
     /**
-     * @param bool $debugMode 
-     * @return void 
+     * @param bool $debugMode
+     * @return void
      */
-    private function setUpWithMode(bool $debugMode = false): void 
+    private function setUpWithMode(bool $debugMode = false): void
     {
         $this->request = new TestRequest();
         $this->responseFactory = new JsonApiErrorResponseFactory();
@@ -286,6 +286,6 @@ class JsonApiErrorMiddlewareTest extends TestCase
             $this->jsonApiErrorResponseSchema,
             $this->httpStatusHelper
         );
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
+        $this->middleware = new JsonApiSingleErrorMiddleware($this->jsonApiErrorService);
     }
 }
