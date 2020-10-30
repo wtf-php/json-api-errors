@@ -1,5 +1,6 @@
 <?php
 
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
@@ -19,13 +20,15 @@ $jsonErrorException = new JsonApiErrorException(
     'testlink'
 );
 
+$jsonApiErrorFactory = new JsonApiErrorFactory(true);
+
 $bag->add($exception);
 $bag->add($anotherException);
 $bag->add($jsonErrorException);
 
-$singleJsonObject = JsonApiErrorFactory::createFromThrowable($exception);
-$singleJsonObjectFromJsonErrorException = JsonApiErrorFactory::createFromThrowable($jsonErrorException);
-$multipleJsonObjects = JsonApiErrorFactory::createFromThrowables($bag->getAll());
+$singleJsonObject = $jsonApiErrorFactory->createFromThrowable($exception);
+$singleJsonObjectFromJsonErrorException = $jsonApiErrorFactory->createFromThrowable($jsonErrorException);
+$multipleJsonObjects = $jsonApiErrorFactory->createFromThrowables($bag->getAll());
 
 print_r($singleJsonObject);
 print_r($multipleJsonObjects);
