@@ -12,6 +12,10 @@ use WtfPhp\JsonApiErrors\JsonApiMultipleErrorMiddleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
+// How to start:
+// php -S localhost:8080 examples/MultipleExceptionMiddlewareExample.php
+// GET http://localhost:8080/test
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = AppFactory::create();
@@ -29,16 +33,11 @@ $app->add(
     )
 );
 
-$app->get(
-    '/index',
-    function (ServerRequestInterface $request): ResponseInterface {
-        /*
-        $bag->add(new Exception('Testing middleware for multiple exceptions', 500));
-        $bag->add(new Exception('Testing middleware for multiple exception 2'));
-        */
-        $response = new Response();
-        return $response->withStatus(200);
-    }
-);
+$app->get('/index', function (ServerRequestInterface $request) use ($bag): ResponseInterface {
+     $bag->add(new Exception('Testing middleware for multiple exceptions', 500));
+     $bag->add(new Exception('Testing middleware for multiple exception 2', 400));
+
+     return new Response();
+});
 
 $app->run();

@@ -5,6 +5,7 @@ namespace WtfPhp\JsonApiErrors\Services;
 use Lukasoppermann\Httpstatus\Httpstatus;
 use Lukasoppermann\Httpstatus\Httpstatuscodes as Status;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Psr7\Response;
 use Throwable;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
@@ -68,8 +69,9 @@ class JsonApiErrorService
      */
     public function buildResponseForMultiple(array $throwables): ResponseInterface
     {
-        $jsonErrorObjects = $this->jsonApiErrorFactory::createFromThrowables($throwables);
+        $jsonErrorObjects = $this->jsonApiErrorFactory->createFromThrowables($throwables);
         $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiErrorList($jsonErrorObjects);
+
         $generalCode = Status::HTTP_INTERNAL_SERVER_ERROR;
         $stati = [];
 
@@ -98,7 +100,7 @@ class JsonApiErrorService
 
         $reasonPhrase = $this->getReasonPhraseForStatusCode($generalCode);
 
-        /** @var JsonApiErrorResponse $response */
+        /** @var Response $response */
         $response = $this->jsonApiErrorResponseFactory->createResponse($generalCode, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
         return $response;

@@ -245,6 +245,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
     private function assertExpectedWithResponse(string $expectedDataFile, ResponseInterface $response)
     {
         $expected = $this->decodeJsonFile(__DIR__ . '/expectations/' . $expectedDataFile);
+        $response->getBody()->rewind();
         $actual = json_decode($response->getBody()->getContents(), true);
 
         $this->assertCount(count($expected['errors']), $actual['errors']);

@@ -37,7 +37,6 @@ class JsonApiMultipleErrorMiddleware implements MiddlewareInterface
         try {
             $response = $handler->handle($request);
         } catch (Throwable $t) {
-            dd($t);
             return $this->jsonApiErrorService->buildResponse($t);
         }
 
