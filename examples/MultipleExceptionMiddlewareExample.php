@@ -2,7 +2,6 @@
 
 use Lukasoppermann\Httpstatus\Httpstatus;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
@@ -14,7 +13,7 @@ use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
 // How to start:
 // php -S localhost:8080 examples/MultipleExceptionMiddlewareExample.php
-// GET http://localhost:8080/test
+// GET http://localhost:8080/multiple
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -33,7 +32,7 @@ $app->add(
     )
 );
 
-$app->get('/index', function (ServerRequestInterface $request) use ($bag): ResponseInterface {
+$app->get('/multiple', function () use ($bag): ResponseInterface {
      $bag->add(new Exception('Testing middleware for multiple exceptions', 500));
      $bag->add(new Exception('Testing middleware for multiple exception 2', 400));
 

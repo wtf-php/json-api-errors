@@ -2,7 +2,6 @@
 
 use Lukasoppermann\Httpstatus\Httpstatus;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\Factory\AppFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
@@ -26,7 +25,7 @@ $app->add(new JsonApiSingleErrorMiddleware(new JsonApiErrorService(
     new Httpstatus()
 )));
 
-$app->get('/single', function (ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+$app->get('/single', function (): ResponseInterface {
     throw new Exception('Testing middleware for a single exception');
 });
 
