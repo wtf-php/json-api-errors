@@ -10,7 +10,6 @@ use Throwable;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponse;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 
 /**
@@ -57,9 +56,10 @@ class JsonApiErrorService
 
         $reasonPhrase = $this->getReasonPhraseForStatusCode($status);
 
-        /** @var JsonApiErrorResponse $response */
+        /** @var Response $response */
         $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
+
         return $response;
     }
 
