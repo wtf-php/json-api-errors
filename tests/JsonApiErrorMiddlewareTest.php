@@ -234,6 +234,8 @@ class JsonApiErrorMiddlewareTest extends TestCase
     private function assertExpectedWithResponse(string $expectedDataFile, ResponseInterface $response)
     {
         $expected = $this->decodeJsonFile(__DIR__ . '/expectations/' . $expectedDataFile);
+        // Needed as the body is a stream and the cursor needs to be set back to the start
+        $response->getBody()->rewind();
         $actual = json_decode($response->getBody()->getContents(), true);
 
         $this->assertCount(count($expected['errors']), $actual['errors']);
@@ -258,11 +260,7 @@ class JsonApiErrorMiddlewareTest extends TestCase
         return json_decode($content, true);
     }
 
-    /**
-     * @param bool $debugMode 
-     * @return void 
-     */
-    private function setUpWithMode(bool $debugMode = false): void 
+    private function setUpWithMode(bool $debugMode = false): void
     {
         $this->request = new TestRequest();
         $this->responseFactory = new JsonApiErrorResponseFactory();
