@@ -13,9 +13,6 @@ class ThrowablesBag implements ThrowablesBagInterface
 {
     protected Collection $bag;
 
-    /**
-     * ThrowablesBag constructor.
-     */
     public function __construct()
     {
         $this->bag = new Collection();

@@ -9,23 +9,26 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Psr7\Response;
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiSingleErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
 
-class JsonApiErrorMiddlewareTest extends TestCase
+class JsonApiErrorMultipleMiddlewareTest extends TestCase
 {
     protected ServerRequestInterface $request;
     protected ResponseFactoryInterface $responseFactory;
-    protected JsonApiSingleErrorMiddleware $middleware;
+    protected JsonApiErrorMiddleware $middleware;
     protected JsonApiErrorFactory $jsonApiErrorFactory;
     protected JsonApiErrorResponseSchema $jsonApiErrorResponseSchema;
     protected JsonApiErrorService $jsonApiErrorService;
     protected Httpstatus $httpStatusHelper;
+    protected ThrowablesBag $bag;
 
     protected function setUp(): void
     {
@@ -40,16 +43,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
             $this->jsonApiErrorResponseSchema,
             $this->httpStatusHelper
         );
-        $this->middleware = new JsonApiSingleErrorMiddleware($this->jsonApiErrorService);
+        $this->bag = new ThrowablesBag();
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService, $this->bag);
     }
 
     /** @test */
     public function itShouldHandleAnExceptionWithoutErrorCodeAndMessage()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new Exception();
+                $this->bag->add(new Exception());
+
+                return new Response();
             }
         };
 
@@ -64,10 +77,19 @@ class JsonApiErrorMiddlewareTest extends TestCase
     /** @test */
     public function itShouldHandleAnExceptionWithAnInvalidStatusCode()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new Exception('Some error occurred', 600);
+                $this->bag->add(new Exception('Some error occurred', 600));
+
+                return new Response();
             }
         };
 
@@ -82,19 +104,88 @@ class JsonApiErrorMiddlewareTest extends TestCase
     /** @test */
     public function itShouldHandleAnExceptionWithValidStatusCodeAndMessage()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new Exception('The entity was not processable', 422);
+                $this->bag->add(new Exception('The entity was not processable', 422));
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
 
         $this->assertExpectedWithResponse('exceptionWithValidStatusCodeAndMessage.json', $response);
+    }
+
+    /** @test */
+    public function itShouldHandleExceptionsWithValidStatusCodeAndMessage()
+    {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->bag->addMultiple([
+                    new Exception('The entity was not processable', 422),
+                    new Exception('Validation error', 403),
+                ]);
+
+                return new Response();
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('exceptionsWithValidStatusCodeAndMessage.json', $response);
+    }
+
+    /** @test */
+    public function itShouldHandleClientAndServerExceptionsWithValidStatusCodeAndMessage()
+    {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->bag->addMultiple([
+                    new Exception('Some server error occurred', 500),
+                    new Exception('Validation error', 403),
+                ]);
+
+                return new Response();
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals('Internal Server Error', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('clientAndServerExceptionsWithValidStatusCodeAndMessage.json', $response);
     }
 
     /** @test */
@@ -102,35 +193,85 @@ class JsonApiErrorMiddlewareTest extends TestCase
     {
         $this->setUpWithMode(true);
 
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new Exception('The entity was not processable', 422);
+                $this->bag->add(new Exception('The entity was not processable', 422));
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
 
         $this->assertExpectedWithResponse('exceptionWithValidStatusCodeMessageAndStacktrace.json', $response);
     }
 
     /** @test */
-    public function itShouldHandleAJsonApiExceptionWithStatusAndTitle()
+    public function itShouldHandleExceptionsWithValidStatusCodeMessageAndStacktrace()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $this->setUpWithMode(true);
+
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('A custom json:api error occurred', 0, null, '422');
+                $this->bag->addMultiple([
+                    new Exception('The entity was not processable', 422),
+                    new Exception('Validation error', 403),
+                ]);
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('exceptionsWithValidStatusCodeMessageAndStacktrace.json', $response);
+    }
+
+    /** @test */
+    public function itShouldHandleAJsonApiExceptionWithStatusAndTitle()
+    {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->bag->add(new JsonApiErrorException('A custom json:api error occurred', 0, null, '422'));
+
+                return new Response();
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
 
         $this->assertExpectedWithResponse('jsonApiExceptionWithStatusAndTitle.json', $response);
     }
@@ -138,17 +279,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
     /** @test */
     public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitle()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('The entity was not processable', '123', null, '422');
+                $this->bag->add(new JsonApiErrorException('The entity was not processable', '123', null, '422'));
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
 
         $this->assertExpectedWithResponse('jsonApiExceptionWithStatusCodeAndTitle.json', $response);
     }
@@ -156,17 +306,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
     // TODO NEXT: Finish this test when detail was implemented properly.
     public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetail()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('The entity was not processable', '123', null, '422');
+                $this->bag->add(new JsonApiErrorException('The entity was not processable', '123', null, '422'));
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleAndDetail.json',
             $response->getBody()->getContents()
@@ -176,18 +335,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
     // TODO NEXT: Finish this test when detail and source were implemented properly.
     public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSource()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                $this->bag->add(new JsonApiErrorException());
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailAndSource.json',
             $response->getBody()->getContents()
@@ -197,18 +364,26 @@ class JsonApiErrorMiddlewareTest extends TestCase
     // TODO NEXT: Finish this test when detail was implemented properly.
     public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMeta()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                // TODO NOW: Add correct instantiation
+                $this->bag->add(new JsonApiErrorException());
+
+                return new Response();
             }
         };
-
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceAndMeta.json',
             $response->getBody()->getContents()
@@ -218,18 +393,27 @@ class JsonApiErrorMiddlewareTest extends TestCase
     // TODO NEXT: Finish this test when detail was implemented properly.
     public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMetaAndId()
     {
-        $nextHandler = new class implements RequestHandlerInterface {
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                // TODO NOW: Add correct instantiation
+                $this->bag->add(new JsonApiErrorException());
+
+                return new Response();
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals('Bad Request', $response->getReasonPhrase());
         $this->assertJsonStringEqualsJsonFile(
             __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
             $response->getBody()->getContents()
@@ -287,6 +471,6 @@ class JsonApiErrorMiddlewareTest extends TestCase
             $this->jsonApiErrorResponseSchema,
             $this->httpStatusHelper
         );
-        $this->middleware = new JsonApiSingleErrorMiddleware($this->jsonApiErrorService);
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService, $this->bag);
     }
 }

@@ -1,0 +1,12 @@
+{
+  "errors": [
+    {
+      "code": "500",
+      "title": "Some server error occurred"
+    },
+    {
+      "code": "403",
+      "title": "Validation error"
+    }
+  ]
+}

@@ -7,25 +7,25 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
 /**
  * Class JsonApiErrorMiddleware
- *
  * @package WtfPhp\JsonApiErrors
  */
-class JsonApiSingleErrorMiddleware implements MiddlewareInterface
+class JsonApiErrorMiddleware implements MiddlewareInterface
 {
     private JsonApiErrorService $jsonApiErrorService;
+    private ?ThrowablesBag $bag;
 
-    public function __construct(JsonApiErrorService $jsonApiErrorService)
+    public function __construct(JsonApiErrorService $jsonApiErrorService, ?ThrowablesBag $bag = null)
     {
         $this->jsonApiErrorService = $jsonApiErrorService;
+        $this->bag = $bag;
     }
 
     /**
-     * Currently handles only a single Throwable.
-     *
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
@@ -33,9 +33,17 @@ class JsonApiSingleErrorMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            return $handler->handle($request);
+            $response = $handler->handle($request);
         } catch (Throwable $t) {
+            // Catch any runtime errors and return them independently
             return $this->jsonApiErrorService->buildResponse($t);
         }
+
+        if (!$this->bag || $this->bag->isEmpty()) {
+            return $response;
+        }
+
+        // Return bundled custom errors
+        return $this->jsonApiErrorService->buildResponseForMultiple($this->bag->getAll());
     }
 }
