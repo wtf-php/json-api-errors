@@ -36,7 +36,7 @@ class JsonApiErrorMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
         } catch (Throwable $t) {
             // Catch any runtime errors and return them independently
-            return $this->jsonApiErrorService->buildResponse($t);
+            return $this->jsonApiErrorService->buildResponseForSingle($t);
         }
 
         if (!$this->bag || $this->bag->isEmpty()) {
