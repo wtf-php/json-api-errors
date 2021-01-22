@@ -4,6 +4,7 @@ use Lukasoppermann\Httpstatus\Httpstatus;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Factory\AppFactory;
+use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
 use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
@@ -19,9 +20,11 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = AppFactory::create();
 $app->addRoutingMiddleware();
 
+$response = new Response();
+
 $app->add(new JsonApiErrorMiddleware(new JsonApiErrorService(
     new JsonApiErrorFactory(false),
-    new JsonApiErrorResponseFactory(),
+    new JsonApiErrorResponseFactory($response),
     new JsonApiErrorResponseSchema(),
     new Httpstatus()
 )));
