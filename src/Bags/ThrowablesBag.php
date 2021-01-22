@@ -13,9 +13,6 @@ class ThrowablesBag implements ThrowablesBagInterface
 {
     protected Collection $bag;
 
-    /**
-     * ThrowablesBag constructor.
-     */
     public function __construct()
     {
         $this->bag = new Collection();
@@ -32,11 +29,13 @@ class ThrowablesBag implements ThrowablesBagInterface
     {
         $throwables = new Collection($throwables);
 
-        $throwables->each(function ($throwable) {
-            if ($throwable instanceof Throwable) {
-                $this->bag->add($throwable);
+        $throwables->each(
+            function ($throwable) {
+                if ($throwable instanceof Throwable) {
+                    $this->bag->add($throwable);
+                }
             }
-        });
+        );
     }
 
     /** @inheritDoc */

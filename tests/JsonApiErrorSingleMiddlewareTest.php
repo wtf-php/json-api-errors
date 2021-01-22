@@ -17,7 +17,7 @@ use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
 
-class JsonApiErrorMiddlewareTest extends TestCase
+class JsonApiErrorSingleMiddlewareTest extends TestCase
 {
     protected ServerRequestInterface $request;
     protected ResponseFactoryInterface $responseFactory;
@@ -29,7 +29,18 @@ class JsonApiErrorMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->setUpWithMode();
+        $this->request = new TestRequest();
+        $this->responseFactory = new JsonApiErrorResponseFactory();
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory(false);
+        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
+        $this->httpStatusHelper = new Httpstatus();
+        $this->jsonApiErrorService = new JsonApiErrorService(
+            $this->jsonApiErrorFactory,
+            $this->responseFactory,
+            $this->jsonApiErrorResponseSchema,
+            $this->httpStatusHelper
+        );
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
     }
 
     /** @test */
@@ -260,6 +271,9 @@ class JsonApiErrorMiddlewareTest extends TestCase
         return json_decode($content, true);
     }
 
+    /**
+     * @param bool $debugMode
+     */
     private function setUpWithMode(bool $debugMode = false): void
     {
         $this->request = new TestRequest();
