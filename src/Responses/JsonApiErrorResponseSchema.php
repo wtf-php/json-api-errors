@@ -26,6 +26,25 @@ class JsonApiErrorResponseSchema
     }
 
     /**
+     * @param array $jsonApiErrors
+     * @return string
+     */
+    public function getAsJsonApiErrorList(array $jsonApiErrors): string
+    {
+        $errors = [];
+
+        foreach ($jsonApiErrors as $jsonApiError) {
+            $error = [];
+            foreach (get_object_vars($jsonApiError) as $key => $value) {
+                $error = $this->addProperty($error, $key, $value);
+            }
+            $errors = array_merge($errors, [$error]);
+        }
+
+        return json_encode(['errors' => $errors]);
+    }
+
+    /**
      * @param array $error
      * @param string $key
      * @param string|array $value
