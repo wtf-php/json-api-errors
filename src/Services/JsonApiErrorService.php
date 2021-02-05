@@ -5,7 +5,6 @@ namespace WtfPhp\JsonApiErrors\Services;
 use Lukasoppermann\Httpstatus\Httpstatus;
 use Lukasoppermann\Httpstatus\Httpstatuscodes as Status;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Psr7\Response;
 use Throwable;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
@@ -56,7 +55,6 @@ class JsonApiErrorService
 
         $reasonPhrase = $this->getReasonPhraseForStatusCode($status);
 
-        /** @var Response $response */
         $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
 
@@ -100,7 +98,6 @@ class JsonApiErrorService
 
         $reasonPhrase = $this->getReasonPhraseForStatusCode($generalCode);
 
-        /** @var Response $response */
         $response = $this->jsonApiErrorResponseFactory->createResponse($generalCode, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
         return $response;
