@@ -302,7 +302,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
         $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeAndDetail.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail and source were implemented properly.
+    /** @test */
     public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSource()
     {
         $nextHandler = new class($this->bag) implements RequestHandlerInterface {
@@ -315,7 +315,17 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                $this->bag->add(new JsonApiErrorException());
+                $this->bag->add(new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '',
+                    [],
+                    '',
+                    ['pointer' => '/data/attributes/first-name']
+                ));
 
                 return new Response();
             }
@@ -323,17 +333,17 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('Bad Request', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailAndSource.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailAndSource.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail was implemented properly.
+    /** @test */
     public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMeta()
     {
+        $this->setUpWithMode(true);
+
         $nextHandler = new class($this->bag) implements RequestHandlerInterface {
             public ThrowablesBag $bag;
 
@@ -344,25 +354,35 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO NOW: Add correct instantiation
-                $this->bag->add(new JsonApiErrorException());
+                $this->bag->add(new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '',
+                    ['foo' => 'bar'],
+                    '',
+                    ['pointer' => '/data/attributes/first-name']
+                ));
 
                 return new Response();
             }
         };
+
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('Bad Request', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceAndMeta.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceAndMeta.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail was implemented properly.
-    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMetaAndId()
+    /** @test */
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndAboutAndMetaAndId()
     {
+        $this->setUpWithMode(true);
+
         $nextHandler = new class($this->bag) implements RequestHandlerInterface {
             public ThrowablesBag $bag;
 
@@ -373,8 +393,16 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO NOW: Add correct instantiation
-                $this->bag->add(new JsonApiErrorException());
+                $this->bag->add(new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '123456',
+                    ['foo' => 'bar'],
+                    'http://example.com',
+                ));
 
                 return new Response();
             }
@@ -382,11 +410,48 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('Bad Request', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailAboutMetaAndId.json', $response);
+    }
+
+    /** @test */
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMetaAndId()
+    {
+        $this->setUpWithMode(true);
+
+        $nextHandler = new class($this->bag) implements RequestHandlerInterface {
+            public ThrowablesBag $bag;
+
+            public function __construct(ThrowablesBag $bag)
+            {
+                $this->bag = $bag;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->bag->add(new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '123456',
+                    ['foo' => 'bar'],
+                    '',
+                    ['pointer' => '/data/attributes/first-name']
+                ));
+
+                return new Response();
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceMetaAndId.json', $response);
     }
 }

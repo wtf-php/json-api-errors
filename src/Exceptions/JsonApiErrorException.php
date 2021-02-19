@@ -16,6 +16,7 @@ class JsonApiErrorException extends Exception
     protected string $id = '';
     protected array $meta = [];
     protected string $aboutLink = '';
+    protected array $source = [];
 
     /**
      * JsonApiErrorException constructor.
@@ -28,6 +29,7 @@ class JsonApiErrorException extends Exception
      * @param string $id
      * @param array $meta
      * @param string $aboutLink
+     * @param array $source
      */
     public function __construct(
         string $message = '',
@@ -37,7 +39,8 @@ class JsonApiErrorException extends Exception
         string $status = '500',
         string $id = '',
         array $meta = [],
-        string $aboutLink = ''
+        string $aboutLink = '',
+        array $source = []
     ) {
         parent::__construct($message, $code, $previous);
 
@@ -46,6 +49,7 @@ class JsonApiErrorException extends Exception
         $this->id = $id;
         $this->meta = $meta;
         $this->aboutLink = $aboutLink;
+        $this->source = $source;
     }
 
     /**
@@ -86,5 +90,13 @@ class JsonApiErrorException extends Exception
     public function getAboutLink(): string
     {
         return $this->aboutLink;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSource(): array
+    {
+        return $this->source;
     }
 }

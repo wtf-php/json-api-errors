@@ -1,0 +1,19 @@
+{
+  "errors": [
+    {
+      "id": "123456",
+      "status": "422",
+      "code": "123",
+      "title": "A custom json:api error occurred",
+      "detail": "Details about the error",
+      "links": {
+        "about": {
+          "href": "http://example.com"
+        }
+      },
+      "meta": {
+        "foo": "bar"
+      }
+    }
+  ]
+}

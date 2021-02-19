@@ -157,66 +157,120 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeAndDetail.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail and source were implemented properly.
+    /** @test */
     public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSource()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                throw new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '',
+                    [],
+                    '',
+                    ['pointer' => '/data/attributes/first-name'],
+                );
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailAndSource.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailAndSource.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail was implemented properly.
+    /** @test */
     public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMeta()
     {
+        $this->setUpWithMode(true);
+
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                throw new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '',
+                    ['foo' => 'bar'],
+                    '',
+                    ['pointer' => '/data/attributes/first-name'],
+                );
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceAndMeta.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceAndMeta.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail was implemented properly.
-    public function itSHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMetaAndId()
+    /** @test */
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndAboutAndMetaAndId()
     {
+        $this->setUpWithMode(true);
+
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // TODO: add correct instantiation
-                throw new JsonApiErrorException();
+                throw new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '123456',
+                    ['foo' => 'bar'],
+                    'http://example.com',
+                );
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailAboutMetaAndId.json', $response);
+    }
+
+    /** @test */
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMetaAndId()
+    {
+        $this->setUpWithMode(true);
+
+        $nextHandler = new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                throw new JsonApiErrorException(
+                    'A custom json:api error occurred',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                    '123456',
+                    ['foo' => 'bar'],
+                    '',
+                    ['pointer' => '/data/attributes/first-name'],
+                );
+            }
+        };
+
+        $response = $this->middleware->process($this->request, $nextHandler);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceMetaAndId.json', $response);
     }
 }
