@@ -1,0 +1,12 @@
+{
+  "errors": [
+    {
+      "status": "422",
+      "title": "The entity was not processable"
+    },
+    {
+      "status": "422",
+      "title": "The entity was not processable"
+    }
+  ]
+}

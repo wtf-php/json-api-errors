@@ -4,7 +4,6 @@ namespace WtfPhp\JsonApiErrors\Tests;
 
 use Exception;
 use Lukasoppermann\Httpstatus\Httpstatus;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,7 +16,7 @@ use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
 
-class JsonApiErrorSingleMiddlewareTest extends TestCase
+class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
 {
     protected ServerRequestInterface $request;
     protected ResponseFactoryInterface $responseFactory;
@@ -44,7 +43,7 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHandleAnExceptionWithoutErrorCodeAndMessage()
+    public function itHandlesAnEmptyException()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -62,7 +61,7 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHandleAnExceptionWithAnInvalidStatusCode()
+    public function itHandlesAnExceptionWithInvalidCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -80,7 +79,7 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHandleAnExceptionWithValidStatusCodeAndMessage()
+    public function itHandlesAnExceptionWithValidCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -98,32 +97,12 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHandleAnExceptionWithValidStatusCodeMessageAndStacktrace()
-    {
-        $this->setUpWithMode(true);
-
-        $nextHandler = new class implements RequestHandlerInterface {
-            public function handle(ServerRequestInterface $request): ResponseInterface
-            {
-                throw new Exception('The entity was not processable', 422);
-            }
-        };
-
-        $response = $this->middleware->process($this->request, $nextHandler);
-
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
-
-        $this->assertExpectedWithResponse('exceptionWithValidStatusCodeMessageAndStacktrace.json', $response);
-    }
-
-    /** @test */
-    public function itShouldHandleAJsonApiExceptionWithStatusAndTitle()
+    public function itHandlesJsonApiExceptionWithStatusAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('A custom json:api error occurred', 0, null, '422');
+                throw new JsonApiErrorException('A custom json:api error occurred', 0, null, '', '422');
             }
         };
 
@@ -136,12 +115,12 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitle()
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessage()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('The entity was not processable', '123', null, '422');
+                throw new JsonApiErrorException('The entity was not processable', '123', null, '', '422');
             }
         };
 
@@ -153,28 +132,32 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
         $this->assertExpectedWithResponse('jsonApiExceptionWithStatusCodeAndTitle.json', $response);
     }
 
-    // TODO NEXT: Finish this test when detail was implemented properly.
-    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetail()
+    /** @test */
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetail()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                throw new JsonApiErrorException('The entity was not processable', '123', null, '422');
+                throw new JsonApiErrorException(
+                    'Unprocessable Entity',
+                    '123',
+                    null,
+                    'Details about the error',
+                    '422',
+                );
             }
         };
 
         $response = $this->middleware->process($this->request, $nextHandler);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('The entity was not processable', $response->getReasonPhrase());
-        $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleAndDetail.json',
-            $response->getBody()->getContents()
-        );
+        $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
+
+        $this->assertExpectedWithResponse('jsonApiExceptionWithStatusCodeTitleAndDetail.json', $response);
     }
 
     // TODO NEXT: Finish this test when detail and source were implemented properly.
-    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSource()
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSource()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -195,7 +178,7 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     // TODO NEXT: Finish this test when detail was implemented properly.
-    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMeta()
+    public function itHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMeta()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -216,7 +199,7 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
     }
 
     // TODO NEXT: Finish this test when detail was implemented properly.
-    public function itShouldHandleAJsonApiExceptionWithStatusAndCodeAndTitleAndDetailAndSourceAndMetaAndId()
+    public function itSHandlesJsonApiExceptionWithStatusAndCodeAndMessageAndDetailAndSourceAndMetaAndId()
     {
         $nextHandler = new class implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -234,59 +217,5 @@ class JsonApiErrorSingleMiddlewareTest extends TestCase
             __DIR__ . '/expectations/jsonApiExceptionWithStatusCodeTitleDetailSourceMetaAndId.json',
             $response->getBody()->getContents()
         );
-    }
-
-    /**
-     * Currently is only set out for a single error!
-     *
-     * @param string $expectedDataFile
-     * @param ResponseInterface $response
-     */
-    private function assertExpectedWithResponse(string $expectedDataFile, ResponseInterface $response)
-    {
-        $expected = $this->decodeJsonFile(__DIR__ . '/expectations/' . $expectedDataFile);
-        // Needed as the body is a stream and the cursor needs to be set back to the start
-        $response->getBody()->rewind();
-        $actual = json_decode($response->getBody()->getContents(), true);
-
-        $this->assertCount(count($expected['errors']), $actual['errors']);
-        $this->assertCount(count($expected['errors'][0]), $actual['errors'][0]);
-
-        foreach ($expected['errors'][0] as $key => $value) {
-            if ($key === 'detail') {
-                $this->assertGreaterThanOrEqual(strlen($expected['errors'][0][$key]), strlen($actual['errors'][0][$key]));
-            } else {
-                $this->assertEquals($expected['errors'][0][$key], $actual['errors'][0][$key]);
-            }
-        }
-    }
-
-    /**
-     * @param string $path
-     * @return array
-     */
-    private function decodeJsonFile(string $path): array
-    {
-        $content = file_get_contents($path);
-        return json_decode($content, true);
-    }
-
-    /**
-     * @param bool $debugMode
-     */
-    private function setUpWithMode(bool $debugMode = false): void
-    {
-        $this->request = new TestRequest();
-        $this->responseFactory = new JsonApiErrorResponseFactory();
-        $this->jsonApiErrorFactory = new JsonApiErrorFactory($debugMode);
-        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
-        $this->httpStatusHelper = new Httpstatus();
-        $this->jsonApiErrorService = new JsonApiErrorService(
-            $this->jsonApiErrorFactory,
-            $this->responseFactory,
-            $this->jsonApiErrorResponseSchema,
-            $this->httpStatusHelper
-        );
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService);
     }
 }

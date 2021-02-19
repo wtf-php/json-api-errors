@@ -19,7 +19,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddOneException()
+    public function itAddsOneException()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -32,7 +32,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddOneError()
+    public function itAddsOneError()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -45,7 +45,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddMultipleThrowables()
+    public function itAddsMultipleThrowables()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -59,7 +59,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddMultipleExceptions()
+    public function itAddsMultipleExceptions()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -73,7 +73,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldAddMultipleErrors()
+    public function itAddsMultipleErrors()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -87,7 +87,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldClearBag()
+    public function itClearsBag()
     {
         $this->assertTrue($this->bag->isEmpty());
 
@@ -98,7 +98,7 @@ class ThrowablesBagTest extends TestCase
     }
 
     /** @test */
-    public function itShouldNotAddNonThrowablesOnMultipleAdditions()
+    public function itDoesNotAddNonThrowablesOnMultipleAdditions()
     {
         $this->assertTrue($this->bag->isEmpty());
 
