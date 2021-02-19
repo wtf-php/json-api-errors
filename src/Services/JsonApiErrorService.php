@@ -38,7 +38,7 @@ class JsonApiErrorService
      * @param Throwable $t
      * @return ResponseInterface
      */
-    public function buildResponse(Throwable $t): ResponseInterface
+    public function buildResponseForSingle(Throwable $t): ResponseInterface
     {
         $jsonApiError = $this->jsonApiErrorFactory->createFromThrowable($t);
         $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiError($jsonApiError);
@@ -70,29 +70,67 @@ class JsonApiErrorService
         $jsonErrorObjects = $this->jsonApiErrorFactory->createFromThrowables($throwables);
         $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiErrorList($jsonErrorObjects);
 
-        $generalCode = Status::HTTP_INTERNAL_SERVER_ERROR;
-        $stati = [];
-
-        foreach ($throwables as $t) {
-            if ($t instanceof JsonApiErrorException) {
-                $status = $t->getStatus();
-            } else {
-                if (empty($t->getCode()) || (!empty($t->getCode()) && !$this->isValidHttpStatusCode($t->getCode()))) {
-                    $status = Status::HTTP_INTERNAL_SERVER_ERROR;
-                } else {
-                    $status = $t->getCode();
-                }
-            }
-
-            $stati[] = $status;
+        if (count($throwables) === 1) {
+            return $this->buildResponse($jsonApiErrors, $this->getStatusFromThrowable($throwables[0]));
         }
 
-        foreach ($stati as $status) {
+        $statuses = [];
+        foreach ($throwables as $t) {
+            $statuses[] = $this->getStatusFromThrowable($t);
+        }
+
+        if ($this->containsEqualStatuses($statuses)) {
+            $status = $statuses[0];
+        } else {
+            $status = $this->determineStatus($statuses);
+        }
+
+        return $this->buildResponse($jsonApiErrors, $status);
+    }
+
+    /**
+     * @param Throwable $t
+     * @return string
+     */
+    private function getStatusFromThrowable(Throwable $t): string
+    {
+        if ($t instanceof JsonApiErrorException) {
+            $status = $t->getStatus();
+        } else {
+            if (empty($t->getCode()) || (!empty($t->getCode()) && !$this->isValidHttpStatusCode($t->getCode()))) {
+                $status = Status::HTTP_INTERNAL_SERVER_ERROR;
+            } else {
+                $status = $t->getCode();
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * @param array $statuses
+     * @return bool
+     */
+    private function containsEqualStatuses(array $statuses): bool
+    {
+        $amountUniqueStatuses = count(array_unique($statuses));
+        return ($amountUniqueStatuses === 1);
+    }
+
+    /**
+     * @param array $statuses
+     * @return string
+     */
+    private function determineStatus(array $statuses): string
+    {
+        $generalStatus = Status::HTTP_INTERNAL_SERVER_ERROR;
+
+        foreach ($statuses as $status) {
             if ($status >= Status::HTTP_INTERNAL_SERVER_ERROR) {
                 break;
             }
 
-            $generalCode = Status::HTTP_BAD_REQUEST;
+            $generalStatus = Status::HTTP_BAD_REQUEST;
             break;
         }
 
@@ -119,5 +157,21 @@ class JsonApiErrorService
     private function getReasonPhraseForStatusCode(int $statusCode): string
     {
         return $this->httpStatusHelper->getReasonPhrase($statusCode);
+    }
+
+    /**
+     * @param string $jsonApiErrors
+     * @param string $generalCode
+     * @return ResponseInterface
+     */
+    private function buildResponse(string $jsonApiErrors, string $status): ResponseInterface
+    {
+        $reasonPhrase = $this->getReasonPhraseForStatusCode($status);
+
+        /** @var Response $response */
+        $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
+        $response->getBody()->write($jsonApiErrors);
+
+        return $response;
     }
 }
