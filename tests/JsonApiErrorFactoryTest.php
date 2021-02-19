@@ -74,7 +74,7 @@ class JsonApiErrorFactoryTest extends TestCase
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertIsArray($jsonApiErrorObject->links);
         $this->assertArrayHasKey('about', $jsonApiErrorObject->links);
-        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']);
+        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']['href']);
     }
 
     /** @test */
@@ -96,7 +96,7 @@ class JsonApiErrorFactoryTest extends TestCase
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertIsArray($jsonApiErrorObject->links);
         $this->assertArrayHasKey('about', $jsonApiErrorObject->links);
-        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']);
+        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']['href']);
         $this->assertEquals('foo', $jsonApiErrorObject->detail);
     }
 
@@ -119,7 +119,7 @@ class JsonApiErrorFactoryTest extends TestCase
         $this->assertInstanceOf(JsonApiError::class, $jsonApiErrorObject);
         $this->assertIsArray($jsonApiErrorObject->links);
         $this->assertArrayHasKey('about', $jsonApiErrorObject->links);
-        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']);
+        $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']['href']);
         $this->assertEquals('foo', $jsonApiErrorObject->detail);
         $this->assertArrayHasKey('bar', $jsonApiErrorObject->meta);
     }

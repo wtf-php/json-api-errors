@@ -2,8 +2,17 @@
 
 namespace WtfPhp\JsonApiErrors\Tests;
 
+use Lukasoppermann\Httpstatus\Httpstatus;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Psr7\Response;
+use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
+use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
+use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
+use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
+use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
+use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
 
 abstract class BaseMiddlewareTest extends TestCase
 {
@@ -47,5 +56,25 @@ abstract class BaseMiddlewareTest extends TestCase
     {
         $content = file_get_contents($path);
         return json_decode($content, true);
+    }
+
+    /**
+     * @param bool $debugMode
+     */
+    protected function setUpWithMode(bool $debugMode = false): void
+    {
+        $this->request = new TestRequest();
+        $this->responseFactory = new JsonApiErrorResponseFactory(new Response());
+        $this->jsonApiErrorFactory = new JsonApiErrorFactory($debugMode);
+        $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
+        $this->httpStatusHelper = new Httpstatus();
+        $this->jsonApiErrorService = new JsonApiErrorService(
+            $this->jsonApiErrorFactory,
+            $this->responseFactory,
+            $this->jsonApiErrorResponseSchema,
+            $this->httpStatusHelper
+        );
+        $this->bag = new ThrowablesBag();
+        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService, $this->bag);
     }
 }
