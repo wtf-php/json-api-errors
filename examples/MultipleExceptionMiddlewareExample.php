@@ -25,7 +25,7 @@ $app->add(
     new JsonApiErrorMiddleware(
         new JsonApiErrorService(
             new JsonApiErrorFactory(false),
-            new JsonApiErrorResponseFactory(),
+            new JsonApiErrorResponseFactory(new Response()),
             new JsonApiErrorResponseSchema(),
             new Httpstatus()
         ),

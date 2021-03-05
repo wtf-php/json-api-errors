@@ -1,9 +1,0 @@
-{
-  "errors": [
-    {
-      "code": "422",
-      "title": "The entity was not processable",
-      "detail": "#0 ..."
-    }
-  ]
-}
