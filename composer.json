@@ -5,11 +5,6 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Johannes Pichler",
-            "email": "admin@fetzi.dev",
-            "role": "Maintainer"
-        },
-        {
             "name": "Daniela Huber",
             "email": "huber.daniela@live.at",
             "role": "Maintainer"
@@ -23,6 +18,11 @@
             "name": "Daniel Wittberger",
             "email": "daniel@wittberger.net",
             "role": "Maintainer"
+        },
+        {
+            "name": "Johannes Pichler",
+            "email": "admin@fetzi.dev",
+            "role": "Founder"
         }
     ],
     "require": {
