@@ -8,7 +8,6 @@ use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Models\JsonApiError;
 
-// TODO NEXT: Rework after adding source and detail!
 class JsonApiErrorFactoryTest extends TestCase
 {
     /** @test */

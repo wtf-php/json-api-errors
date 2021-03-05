@@ -20,11 +20,9 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = AppFactory::create();
 $app->addRoutingMiddleware();
 
-$response = new Response();
-
 $app->add(new JsonApiErrorMiddleware(new JsonApiErrorService(
     new JsonApiErrorFactory(false),
-    new JsonApiErrorResponseFactory($response),
+    new JsonApiErrorResponseFactory(new Response()),
     new JsonApiErrorResponseSchema(),
     new Httpstatus()
 )));

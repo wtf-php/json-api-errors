@@ -110,17 +110,13 @@ class ThrowablesBagTest extends TestCase
         }
     }
 
-    /**
-     * @return Throwable[]
-     */
+    /** @return Throwable[] */
     private function getThrowables(): array
     {
         return array_merge($this->getExceptions(), $this->getErrors());
     }
 
-    /**
-     * @return Exception[]
-     */
+    /** @return Exception[] */
     private function getExceptions(): array
     {
         return [
@@ -130,9 +126,7 @@ class ThrowablesBagTest extends TestCase
         ];
     }
 
-    /**
-     * @return Error[]
-     */
+    /** @return Error[] */
     private function getErrors(): array
     {
         return [
@@ -142,9 +136,7 @@ class ThrowablesBagTest extends TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
+    /** @return array */
     private function getThrowablesAndNonThrowables(): array
     {
         return [

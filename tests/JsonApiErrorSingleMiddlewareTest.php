@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
@@ -29,7 +30,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
     protected function setUp(): void
     {
         $this->request = new TestRequest();
-        $this->responseFactory = new JsonApiErrorResponseFactory();
+        $this->responseFactory = new JsonApiErrorResponseFactory(new Response());
         $this->jsonApiErrorFactory = new JsonApiErrorFactory(false);
         $this->jsonApiErrorResponseSchema = new JsonApiErrorResponseSchema();
         $this->httpStatusHelper = new Httpstatus();
@@ -57,7 +58,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals('Internal Server Error', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('exceptionWithoutCodeAndMessage.json', $response);
+        $this->assertExpectedWithResponse('exceptions/simpleServerError.json', $response);
     }
 
     /** @test */
@@ -75,7 +76,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals('Internal Server Error', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('exceptionWithInvalidCode.json', $response);
+        $this->assertExpectedWithResponse('exceptions/invalidCode.json', $response);
     }
 
     /** @test */
@@ -93,7 +94,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('exceptionWithValidStatusCodeAndMessage.json', $response);
+        $this->assertExpectedWithResponse('exceptions/simpleClientError.json', $response);
     }
 
     /** @test */
@@ -111,7 +112,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptionWithStatusAndTitle.json', $response);
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusAndTitle.json', $response);
     }
 
     /** @test */
@@ -129,7 +130,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptionWithStatusCodeAndTitle.json', $response);
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleAndCode.json', $response);
     }
 
     /** @test */
@@ -153,7 +154,7 @@ class JsonApiErrorSingleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptionWithStatusCodeTitleAndDetail.json', $response);
+        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeAndDetail.json', $response);
     }
 
     // TODO NEXT: Finish this test when detail and source were implemented properly.
