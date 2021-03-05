@@ -41,7 +41,7 @@ class JsonApiErrorService
     public function buildResponseForSingle(Throwable $t): ResponseInterface
     {
         $jsonApiError = $this->jsonApiErrorFactory->createFromThrowable($t);
-        $jsonApiErrors = $this->jsonApiErrorResponseSchema->getAsJsonApiError($jsonApiError);
+        $jsonApiError = $this->jsonApiErrorResponseSchema->getAsJsonApiError($jsonApiError);
 
         if ($t instanceof JsonApiErrorException) {
             $status = $t->getStatus();
@@ -53,12 +53,7 @@ class JsonApiErrorService
             }
         }
 
-        $reasonPhrase = $this->getReasonPhraseForStatusCode($status);
-
-        $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
-        $response->getBody()->write($jsonApiErrors);
-
-        return $response;
+        return $this->buildResponse($jsonApiError, $status);
     }
 
     /**
@@ -134,11 +129,7 @@ class JsonApiErrorService
             break;
         }
 
-        $reasonPhrase = $this->getReasonPhraseForStatusCode($generalCode);
-
-        $response = $this->jsonApiErrorResponseFactory->createResponse($generalCode, $reasonPhrase);
-        $response->getBody()->write($jsonApiErrors);
-        return $response;
+        return $generalStatus;
     }
 
     /**
@@ -161,14 +152,13 @@ class JsonApiErrorService
 
     /**
      * @param string $jsonApiErrors
-     * @param string $generalCode
+     * @param string $status
      * @return ResponseInterface
      */
     private function buildResponse(string $jsonApiErrors, string $status): ResponseInterface
     {
         $reasonPhrase = $this->getReasonPhraseForStatusCode($status);
 
-        /** @var Response $response */
         $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
 
