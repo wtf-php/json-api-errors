@@ -32,13 +32,16 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
             $jsonError->id = $throwable->getId();
             $jsonError->status = $throwable->getStatus();
             $jsonError->detail = $throwable->getDetail();
+            $jsonError->source = $throwable->getSource();
 
             if ($this->debug) {
                 $jsonError->meta = $throwable->getMeta();
 
                 if (!empty($throwable->getAboutLink())) {
                     $jsonError->links = [
-                        'about' => $throwable->getAboutLink(),
+                        'about' => [
+                            'href' => $throwable->getAboutLink(),
+                        ],
                     ];
                 }
             }
