@@ -162,6 +162,6 @@ class JsonApiErrorService
         $response = $this->jsonApiErrorResponseFactory->createResponse($status, $reasonPhrase);
         $response->getBody()->write($jsonApiErrors);
 
-        return $response;
+        return $response->withHeader('Content-type', 'application/vnd.api+json');
     }
 }
