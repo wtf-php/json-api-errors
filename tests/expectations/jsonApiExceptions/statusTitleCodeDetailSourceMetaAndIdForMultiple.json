@@ -10,7 +10,11 @@
         "pointer": "/data/attributes/first-name"
       },
       "meta": {
-        "foo": "bar"
+        "message": "A custom json:api error occurred",
+        "exception": "WtfPhp\\JsonApiErrors\\Exceptions\\JsonApiErrorException",
+        "file": "/json-api-errors/tests/JsonApiErrorMultipleMiddlewareTest.php",
+        "line": 440,
+        "trace": { }
       }
     }
   ]

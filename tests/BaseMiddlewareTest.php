@@ -40,10 +40,23 @@ abstract class BaseMiddlewareTest extends TestCase
             $this->assertCount(count($expectedErrorValues), $actualErrorValues);
 
             foreach ($expectedErrorValues as $expectedErrorValueKey => $expectedErrorValue) {
-                $this->assertEquals(
-                    $expectedErrorValues[$expectedErrorValueKey],
-                    $actualErrorValues[$expectedErrorValueKey]
-                );
+                // Special handling for `meta` as we don't want to compare stack-traces.
+                if (is_array($expectedErrorValue) && $expectedErrorValueKey === 'meta') {
+                    foreach ($expectedErrorValue as $key => $value) {
+                        if ($key === 'trace') {
+                            $this->assertArrayHasKey('trace', $expectedErrorValue);
+                        } elseif ($key === 'file') {
+                            $this->assertStringEndsWith($value, $actualErrorValues[$expectedErrorValueKey][$key]);
+                        } else {
+                            $this->assertEquals($value, $actualErrorValues[$expectedErrorValueKey][$key]);
+                        }
+                    }
+                } else {
+                    $this->assertEquals(
+                        $expectedErrorValue,
+                        $actualErrorValues[$expectedErrorValueKey]
+                    );
+                }
             }
         }
     }
