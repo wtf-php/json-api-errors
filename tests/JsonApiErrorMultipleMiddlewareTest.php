@@ -361,7 +361,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
                     'Details about the error',
                     '422',
                     '',
-                    ['foo' => 'bar'],
+                    [],
                     '',
                     ['pointer' => '/data/attributes/first-name']
                 ));
@@ -375,7 +375,10 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceAndMeta.json', $response);
+        $this->assertExpectedWithResponse(
+            'jsonApiExceptions/statusTitleCodeDetailSourceAndMetaForMultiple.json',
+            $response
+        );
     }
 
     /** @test */
@@ -400,7 +403,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
                     'Details about the error',
                     '422',
                     '123456',
-                    ['foo' => 'bar'],
+                    [],
                     'http://example.com',
                 ));
 
@@ -413,7 +416,10 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailAboutMetaAndId.json', $response);
+        $this->assertExpectedWithResponse(
+            'jsonApiExceptions/statusTitleCodeDetailAboutMetaAndIdForMultiple.json',
+            $response
+        );
     }
 
     /** @test */
@@ -438,7 +444,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
                     'Details about the error',
                     '422',
                     '123456',
-                    ['foo' => 'bar'],
+                    [],
                     '',
                     ['pointer' => '/data/attributes/first-name']
                 ));
@@ -452,6 +458,9 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Unprocessable Entity', $response->getReasonPhrase());
 
-        $this->assertExpectedWithResponse('jsonApiExceptions/statusTitleCodeDetailSourceMetaAndId.json', $response);
+        $this->assertExpectedWithResponse(
+            'jsonApiExceptions/statusTitleCodeDetailSourceMetaAndIdForMultiple.json',
+            $response
+        );
     }
 }

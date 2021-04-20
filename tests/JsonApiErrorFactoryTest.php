@@ -111,7 +111,7 @@ class JsonApiErrorFactoryTest extends TestCase
             'foo',
             '504',
             '1',
-            ['bar' => 'baz'],
+            [],
             'testlink'
         );
         $jsonApiErrorObject = $jsonApiErrorFactory->createFromThrowable($jsonException);
@@ -121,7 +121,8 @@ class JsonApiErrorFactoryTest extends TestCase
         $this->assertArrayHasKey('about', $jsonApiErrorObject->links);
         $this->assertStringContainsString('testlink', $jsonApiErrorObject->links['about']['href']);
         $this->assertEquals('foo', $jsonApiErrorObject->detail);
-        $this->assertArrayHasKey('bar', $jsonApiErrorObject->meta);
+        $this->assertArrayHasKey('message', $jsonApiErrorObject->meta);
+        $this->assertEquals('a custom message', $jsonApiErrorObject->meta['message']);
     }
 
     /** @test */

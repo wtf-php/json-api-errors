@@ -3,6 +3,7 @@
 namespace WtfPhp\JsonApiErrors\Factories;
 
 use Throwable;
+use Tightenco\Collect\Support\Arr;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Models\JsonApiError;
 
@@ -35,7 +36,15 @@ class JsonApiErrorFactory implements JsonApiErrorFactoryInterface
             $jsonError->source = $throwable->getSource();
 
             if ($this->debug) {
-                $jsonError->meta = $throwable->getMeta();
+                $jsonError->meta = collect([
+                    'message' => $throwable->getMessage(),
+                    'exception' => get_class($throwable),
+                    'file' => $throwable->getFile(),
+                    'line' => $throwable->getLine(),
+                    'trace' => collect($throwable->getTrace())->map(function ($trace) {
+                        return Arr::except($trace, ['args']);
+                    })->all(),
+                ])->filter()->toArray();
 
                 if (!empty($throwable->getAboutLink())) {
                     $jsonError->links = [

@@ -1,0 +1,23 @@
+{
+  "errors": [
+    {
+      "id": "123456",
+      "status": "422",
+      "code": "123",
+      "title": "A custom json:api error occurred",
+      "detail": "Details about the error",
+      "links": {
+        "about": {
+          "href": "http://example.com"
+        }
+      },
+      "meta": {
+        "message": "A custom json:api error occurred",
+        "exception": "WtfPhp\\JsonApiErrors\\Exceptions\\JsonApiErrorException",
+        "file": "/json-api-errors/tests/JsonApiErrorSingleMiddlewareTest.php",
+        "line": 229,
+        "trace": {}
+      }
+    }
+  ]
+}
