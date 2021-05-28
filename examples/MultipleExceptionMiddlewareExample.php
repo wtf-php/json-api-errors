@@ -7,12 +7,12 @@ use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiErrorPSR15Middleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
 // How to start:
-// php -S localhost:8080 examples/JsonApiErrorMiddlewareExample.php
+// php -S localhost:8080 examples/JsonApiErrorPSR15MiddlewareExample.php
 // GET http://localhost:8080/single
 // GET http://localhost:8080/multiple
 
@@ -22,7 +22,7 @@ $app = AppFactory::create();
 $bag = new ThrowablesBag();
 
 $app->add(
-    new JsonApiErrorMiddleware(
+    new JsonApiErrorPSR15Middleware(
         new JsonApiErrorService(
             new JsonApiErrorFactory(false),
             new JsonApiErrorResponseFactory(new Response()),

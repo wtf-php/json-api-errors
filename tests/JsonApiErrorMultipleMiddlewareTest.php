@@ -13,7 +13,7 @@ use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Exceptions\JsonApiErrorException;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiErrorPSR15Middleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
@@ -22,7 +22,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
 {
     protected ServerRequestInterface $request;
     protected ResponseFactoryInterface $responseFactory;
-    protected JsonApiErrorMiddleware $middleware;
+    protected JsonApiErrorPSR15Middleware $middleware;
     protected JsonApiErrorFactory $jsonApiErrorFactory;
     protected JsonApiErrorResponseSchema $jsonApiErrorResponseSchema;
     protected JsonApiErrorService $jsonApiErrorService;
@@ -43,7 +43,7 @@ class JsonApiErrorMultipleMiddlewareTest extends BaseMiddlewareTest
             $this->httpStatusHelper
         );
         $this->bag = new ThrowablesBag();
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService, $this->bag);
+        $this->middleware = new JsonApiErrorPSR15Middleware($this->jsonApiErrorService, $this->bag);
     }
 
     /** @test */
