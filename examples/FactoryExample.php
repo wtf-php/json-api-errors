@@ -13,7 +13,8 @@ $jsonErrorException = new JsonApiErrorException(
     'a custom message',
     303,
     null,
-    500,
+    '',
+    '500',
     '504',
     ['bar' => 'baz'],
     'testlink'

@@ -11,11 +11,6 @@ use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
-// How to start:
-// php -S localhost:8080 examples/JsonApiErrorMiddlewareExample.php
-// GET http://localhost:8080/single
-// GET http://localhost:8080/multiple
-
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = AppFactory::create();
