@@ -7,7 +7,7 @@ use Slim\Factory\AppFactory;
 use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiErrorPSR15Middleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
@@ -20,7 +20,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = AppFactory::create();
 $app->addRoutingMiddleware();
 
-$app->add(new JsonApiErrorMiddleware(new JsonApiErrorService(
+$app->add(new JsonApiErrorPSR15Middleware(new JsonApiErrorService(
     new JsonApiErrorFactory(false),
     new JsonApiErrorResponseFactory(new Response()),
     new JsonApiErrorResponseSchema(),

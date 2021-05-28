@@ -9,7 +9,7 @@ use Slim\Psr7\Response;
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorFactory;
 use WtfPhp\JsonApiErrors\Factories\JsonApiErrorResponseFactory;
-use WtfPhp\JsonApiErrors\JsonApiErrorMiddleware;
+use WtfPhp\JsonApiErrors\JsonApiErrorPSR15Middleware;
 use WtfPhp\JsonApiErrors\Responses\JsonApiErrorResponseSchema;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 use WtfPhp\JsonApiErrors\Tests\Fakes\TestRequest;
@@ -88,6 +88,6 @@ abstract class BaseMiddlewareTest extends TestCase
             $this->httpStatusHelper
         );
         $this->bag = new ThrowablesBag();
-        $this->middleware = new JsonApiErrorMiddleware($this->jsonApiErrorService, $this->bag);
+        $this->middleware = new JsonApiErrorPSR15Middleware($this->jsonApiErrorService, $this->bag);
     }
 }
