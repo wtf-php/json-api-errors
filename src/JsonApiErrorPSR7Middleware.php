@@ -20,7 +20,10 @@ class JsonApiErrorPSR7Middleware
     }
 
     /**
-     * @throws Exception
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $next
+     * @return ResponseInterface
      */
     public function __invoke(
         RequestInterface $request,
@@ -28,14 +31,14 @@ class JsonApiErrorPSR7Middleware
         callable $next
     ): ResponseInterface {
         try {
-            return $next($request, $response);
+            $response = $next($request, $response);
         } catch (Throwable $t) {
             // Catch any runtime errors and return them independently
             return $this->jsonApiErrorService->buildResponseForSingle($t);
         }
 
         if (!$this->bag || $this->bag->isEmpty()) {
-            return $next($request, $response);
+            return $response;
         }
 
         // Return bundled custom errors

@@ -10,7 +10,7 @@ use Throwable;
 use WtfPhp\JsonApiErrors\Bags\ThrowablesBag;
 use WtfPhp\JsonApiErrors\Services\JsonApiErrorService;
 
-class JsonApiErrorPSR15Middleware
+class JsonApiErrorPSR15Middleware implements MiddlewareInterface
 {
     private JsonApiErrorService $jsonApiErrorService;
     private ?ThrowablesBag $bag;
